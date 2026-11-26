@@ -1,0 +1,1808 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Traceability &amp; Flow of Work Practice Lab</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --text:#1d2330; --muted:#5d6678; --line:#e1e5ec;
+  --accent:#0f6cbd; --accent-soft:#e6f0fa; --ok:#127a3c; --ok-soft:#e5f5eb; --bad:#b42318; --bad-soft:#fdecea;
+  --warn:#a35200; --warn-soft:#fdf1e3;
+  --code-bg:#0f1720; --code-text:#d6dde8;
+  --k:#7cc4ff; --s:#f2b880; --c:#7d8a9c; --d:#d7a6ff; --n:#9fe3a8; --t:#6fd6c9;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1116; --panel:#161b22; --text:#e3e8ef; --muted:#9aa4b2; --line:#2a313c;
+    --accent:#4ea1f3; --accent-soft:#16283c; --ok:#4cc27a; --ok-soft:#13281c; --bad:#ff7b72; --bad-soft:#2d1615;
+    --warn:#f0b450; --warn-soft:#2b2112;
+    --code-bg:#0a0d12;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1116; --panel:#161b22; --text:#e3e8ef; --muted:#9aa4b2; --line:#2a313c;
+  --accent:#4ea1f3; --accent-soft:#16283c; --ok:#4cc27a; --ok-soft:#13281c; --bad:#ff7b72; --bad-soft:#2d1615;
+  --warn:#f0b450; --warn-soft:#2b2112;
+  --code-bg:#0a0d12;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+code,pre,textarea{font-family:"Cascadia Code",Consolas,"SF Mono",Menlo,monospace}
+.app{display:grid;grid-template-columns:290px minmax(0,1fr);min-height:100vh}
+aside{background:var(--panel);border-right:1px solid var(--line);padding:20px 14px;position:sticky;top:0;height:100vh;overflow:auto}
+aside h1{font-size:18px;margin:0 8px 4px}
+aside .sub{color:var(--muted);font-size:13px;margin:0 8px 14px}
+.progress{height:6px;background:var(--line);border-radius:4px;margin:0 8px 6px;overflow:hidden}
+.progress>div{height:100%;background:var(--ok);width:0;transition:width .3s}
+.ptext{font-size:12px;color:var(--muted);margin:0 8px 14px}
+nav button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:none;color:var(--text);
+  padding:8px 10px;border-radius:8px;cursor:pointer;font-size:14px}
+nav button:hover{background:var(--accent-soft)}
+nav button.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+nav .num{flex:0 0 24px;height:24px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:12px;color:var(--muted)}
+nav button.done .num{background:var(--ok);border-color:var(--ok);color:#fff}
+nav .cnt{margin-left:auto;font-size:11px;color:var(--muted);font-weight:400}
+nav .group{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:14px 10px 4px}
+.sidefoot{margin:18px 8px 0;display:grid;gap:10px;justify-items:start}
+.sidefoot a{font-size:13px;color:var(--accent)}
+.theme{font-size:13px;background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 10px;cursor:pointer}
+main{padding:32px 40px 80px;max-width:980px;width:100%}
+.tag{display:inline-block;font-size:12px;color:var(--accent);background:var(--accent-soft);padding:2px 10px;border-radius:20px;margin-bottom:8px}
+h2{font-size:28px;margin:0 0 8px}
+h3{font-size:19px;margin:28px 0 8px}
+p{margin:8px 0}
+.lead{color:var(--muted);font-size:17px}
+:not(pre)>code{background:var(--accent-soft);padding:1px 6px;border-radius:5px;font-size:.9em;overflow-wrap:anywhere}
+.codewrap{position:relative;margin:12px 0}
+pre{background:var(--code-bg);color:var(--code-text);padding:16px 18px;border-radius:10px;overflow:auto;font-size:14px;line-height:1.55;margin:0}
+.file{font-size:12px;color:var(--muted);margin:12px 0 -6px;font-family:Consolas,monospace}
+.copy{position:absolute;top:8px;right:8px;font-size:12px;background:#ffffff1a;color:#cfd8e3;border:0;border-radius:6px;padding:4px 9px;cursor:pointer}
+.copy:hover{background:#ffffff33}
+.tk{color:var(--k)} .ts{color:var(--s)} .tc{color:var(--c);font-style:italic} .td{color:var(--d)} .tn{color:var(--n)} .tt{color:var(--t)}
+.tdash{color:var(--c)}
+ul.tips,ol.tips{padding-left:20px} .tips li{margin:4px 0}
+table.ref{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+table.ref th,table.ref td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+table.ref th{background:var(--accent-soft);font-weight:600}
+.tablewrap{overflow-x:auto}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:14px 0;font-size:15px}
+.note.exam{border-left-color:var(--warn);background:var(--warn-soft)}
+.exercise{margin-top:30px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}
+.exercise h3{margin-top:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.exercise h3 .kind{font-size:12px;font-weight:500;color:var(--muted);border:1px solid var(--line);border-radius:20px;padding:1px 10px}
+.exercise h3 .badge{font-size:12px;background:var(--ok);color:#fff;border-radius:20px;padding:2px 10px;display:none}
+.exercise.solved h3 .badge{display:inline-block}
+.exercise.solved{border-color:var(--ok)}
+textarea{width:100%;min-height:220px;background:var(--code-bg);color:var(--code-text);border:1px solid var(--line);border-radius:10px;
+  padding:14px;font-size:14px;line-height:1.55;resize:vertical;tab-size:2;outline:none;white-space:pre;overflow:auto}
+textarea.short{min-height:120px;white-space:pre-wrap}
+textarea:focus{border-color:var(--accent)}
+.edhelp{font-size:12px;color:var(--muted);margin:4px 0 0}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:14px}
+.btn:hover{border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.btn.small{padding:2px 9px;font-size:13px}
+.results{list-style:none;padding:0;margin:10px 0}
+.results li{padding:6px 12px;border-radius:7px;margin:4px 0;font-size:14px}
+.results li.pass{background:var(--ok-soft);color:var(--ok)}
+.results li.fail{background:var(--bad-soft);color:var(--bad)}
+.results li .sub{display:block;font-size:13px;margin:2px 0 0 18px;opacity:.9}
+.hint{display:none;background:var(--accent-soft);padding:10px 14px;border-radius:8px;font-size:15px;margin:8px 0}
+.why{display:none;border-left:3px solid var(--ok);background:var(--ok-soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:10px 0;font-size:15px}
+.solution{display:none;margin:10px 0}
+.solution .solhead{font-size:13px;color:var(--muted);font-weight:600;margin:0 0 6px}
+/* choice */
+.opts{display:grid;gap:8px;margin:12px 0}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:var(--bg)}
+.opt:hover{border-color:var(--accent)}
+.opt input{margin-top:5px;flex:0 0 auto}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+/* order */
+.order{list-style:none;padding:0;margin:12px 0;display:grid;gap:6px}
+.order li{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg)}
+.order li .pos{flex:0 0 24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:12px;font-weight:600}
+.order li .txt{flex:1}
+.order li .mv{display:flex;gap:4px}
+.order li.right{border-color:var(--ok);background:var(--ok-soft)}
+.order li.wrong{border-color:var(--bad);background:var(--bad-soft)}
+/* match */
+.match{width:100%;border-collapse:collapse;margin:12px 0;font-size:15px}
+.match td{border-bottom:1px solid var(--line);padding:8px 6px;vertical-align:middle}
+.match td:first-child{width:58%}
+.match select{width:100%;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:14px}
+.match tr.right td{background:var(--ok-soft)}
+.match tr.wrong td{background:var(--bad-soft)}
+/* fill */
+.fill{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px 0;line-height:2.3}
+.fill.mono{font-family:"Cascadia Code",Consolas,"SF Mono",Menlo,monospace;font-size:14px;white-space:pre-wrap;line-height:2.2}
+.fill input{font:inherit;font-size:14px;padding:2px 8px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--text);min-width:90px}
+.fill input.right{border-color:var(--ok);background:var(--ok-soft)}
+.fill input.wrong{border-color:var(--bad);background:var(--bad-soft)}
+/* lines */
+.lines{background:var(--code-bg);border-radius:10px;padding:8px 0;margin:12px 0;overflow:auto}
+.lines .ln{display:flex;gap:12px;padding:2px 14px;cursor:pointer;color:var(--code-text);font-family:"Cascadia Code",Consolas,"SF Mono",Menlo,monospace;font-size:14px;white-space:pre;border-left:3px solid transparent}
+.lines .ln:hover{background:#ffffff12}
+.lines .ln .no{color:var(--c);user-select:none;min-width:20px;text-align:right}
+.lines .ln.sel{background:#f2b88026;border-left-color:var(--s)}
+.lines .ln.right{background:#4cc27a2e;border-left-color:var(--n)}
+.lines .ln.wrong{background:#ff7b7230;border-left-color:#ff7b72}
+.lines.prose .ln{font-family:inherit;white-space:normal}
+.navfoot{display:flex;justify-content:space-between;margin-top:30px}
+.menu{display:none}
+@media (max-width:820px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  aside{position:fixed;inset:0 30% 0 0;z-index:5;transform:translateX(-105%);transition:transform .2s;height:100vh}
+  aside.open{transform:none;box-shadow:0 0 40px #0006}
+  main{padding:16px 16px 60px}
+  .menu{display:inline-block;margin-bottom:12px}
+  h2{font-size:23px}
+  .match td{display:block;width:100% !important;border:0;padding:4px 6px}
+  .match tr{display:block;border-bottom:1px solid var(--line);padding:6px 0}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="side">
+    <h1>Flow of Work Lab</h1>
+    <p class="sub">AZ-400 · 1.1 Traceability &amp; flow of work</p>
+    <div class="progress"><div id="bar"></div></div>
+    <p class="ptext" id="ptext"></p>
+    <nav id="nav"></nav>
+    <div class="sidefoot">
+      <button class="theme" id="themeBtn">Toggle theme</button>
+      <button class="theme" id="resetAllBtn">Reset progress</button>
+      <a href="../azure-pipelines-tutorial/index.html">Open the Azure Pipelines Practice Lab</a>
+      <a href="../bicep-tutorial/index.html">Open the Bicep Practice Lab</a>
+    </div>
+  </aside>
+  <main>
+    <button class="btn menu" id="menuBtn">☰ Modules</button>
+    <div id="content"></div>
+  </main>
+</div>
+
+<script>
+/* ===================================================================
+   MODULE DATA
+   Exercise types (all share: id, title, q, hint, why):
+     mc     options[], answer: index
+     multi  options[], answer: [indexes]           (select all that apply)
+     order  items[] in the CORRECT order (shown shuffled)
+     match  rows: [[left html, correct choice]], choices[]
+     fill   tpl with [[0]], [[1]]… blanks, blanks: [[accepted…]]  (first = shown in solution)
+     lines  code: [lines], answer: [line indexes]  (click the faulty lines)
+     text   lang: "yaml" | "text", starter, checks: [{l, t: api => bool}], solution
+            yaml → api is the YAML query api (h, item, count, first, src)
+            text → api is { src, lines }
+   =================================================================== */
+const KW = "(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)";   // GitHub closing keywords
+const MODULES = [
+/* ================================================================ 1 */
+{
+  group:"Structure the work",
+  title:"GitHub Flow",
+  tag:"branch · pull request · review · merge · deploy",
+  intro:`<b>GitHub Flow</b> is a lightweight, branch-based workflow. There is <b>one long-lived branch</b> (<code>main</code>) that is always deployable. Every change, big or small, happens on a short-lived branch and comes back through a <b>pull request</b>, where review and automated checks act as the quality gate.`,
+  sections:[
+    {h:"The loop", lang:"text", code:`main ──●───────────────────────●──────────▶  always deployable
+        \\                     /
+         ●──●──●  feature/login-timeout
+         │  │  │
+         │  │  └ push → open PR → review + CI checks → merge → deploy → delete branch
+         │  └ small, focused commits
+         └ git switch -c feature/login-timeout`,
+     p:`GitHub's own guide lists the steps as: <b>create a branch → make changes (commit, push) → create a pull request → address review comments → merge → delete the branch</b>. Teams practising continuous delivery deploy <code>main</code> right after the merge. (The original 2011 description also allowed deploying the branch to production <i>before</i> merging, to verify it; either way, <code>main</code> stays deployable.)`},
+    {h:"GitHub Flow vs. other branching models", after:`<div class="tablewrap"><table class="ref">
+<tr><th>Model</th><th>Long-lived branches</th><th>Fits when</th></tr>
+<tr><td><b>GitHub Flow</b></td><td><code>main</code> only</td><td>Web apps / services that deploy continuously; one version in production</td></tr>
+<tr><td><b>Trunk-based development</b></td><td><code>main</code> only, branches live hours (or commit to trunk directly), feature flags for unfinished work</td><td>Very high deployment frequency, strong CI</td></tr>
+<tr><td><b>Git Flow</b></td><td><code>main</code> + <code>develop</code>, plus <code>release/*</code> and <code>hotfix/*</code></td><td>Scheduled releases, several versions supported at once</td></tr>
+</table></div>`},
+    {h:"Making it stick: protect main", p:`The flow is only a convention until you enforce it. Use <b>branch protection rules</b> or <b>repository rulesets</b> on <code>main</code>:`,
+     lang:"text", code:`Require a pull request before merging
+  └ Require approvals (e.g. 1 or 2)
+  └ Dismiss stale approvals when new commits are pushed
+  └ Require review from Code Owners
+Require status checks to pass (your CI workflow)
+Require conversation resolution before merging
+Block force pushes · Restrict deletions`},
+    {h:"Command line version", lang:"sh", code:`git switch -c fix/login-timeout          # 1 branch from an up-to-date main
+git commit -am "Increase session timeout" # 2 small commits
+git push -u origin fix/login-timeout      #   publish the branch, set upstream
+gh pr create --fill --base main           # 3 open the pull request (GitHub CLI)
+gh pr merge --squash --delete-branch      # 5 merge + delete the branch after review`}
+  ],
+  tip:`If a scenario says "one production version, deploy many times a day, keep it simple", the answer is <b>GitHub Flow</b> (or trunk-based). If it mentions <b>long-lived develop and release branches</b> or supporting several released versions, that's <b>Git Flow</b>. Enforcement of the flow = <b>branch protection / rulesets</b> with required reviews and status checks.`,
+  exercises:[
+    {id:"gf1", type:"order", title:"Put GitHub Flow in order",
+     q:`Drag (or use the arrows) to put the steps of GitHub Flow in the right order.`,
+     items:[
+       "Create a descriptively named branch from main",
+       "Commit small changes and push the branch",
+       "Open a pull request against main",
+       "Discuss, review and let the CI status checks run",
+       "Merge the pull request into main",
+       "Deploy main and delete the feature branch"
+     ],
+     hint:`Nothing reaches <code>main</code> without a pull request, and nothing is merged before it has been reviewed.`,
+     why:`Branch → commit/push → pull request → review + checks → merge → deploy/clean up. The pull request is the centre of the flow: it is where discussion, review, CI results and (later) traceability links all live.`},
+    {id:"gf2", type:"mc", title:"Pick the branching strategy",
+     q:`A team runs a single SaaS web app. They deploy to production several times a day, have strong automated tests and want the simplest possible branching model where <code>main</code> is always releasable. Which strategy fits best?`,
+     options:[
+       "Git Flow with develop, release/* and hotfix/* branches",
+       "GitHub Flow: short-lived branches merged into main through pull requests",
+       "One long-lived branch per developer, merged monthly",
+       "Release branches per sprint, with fixes cherry-picked back to main"
+     ], answer:1,
+     hint:`Look for "one production version" and "deploy many times a day".`,
+     why:`GitHub Flow has one long-lived branch and short-lived topic branches, which matches continuous deployment of a single version. Git Flow adds develop/release branches that slow delivery down and only pay off with scheduled releases or multiple supported versions.`},
+    {id:"gf3", type:"multi", title:"Enforce the flow on main",
+     q:`Which settings in a branch protection rule (or ruleset) on <code>main</code> help enforce GitHub Flow? <i>Select all that apply.</i>`,
+     options:[
+       "Require a pull request before merging, with at least one approval",
+       "Require status checks to pass before merging",
+       "Allow force pushes for everyone",
+       "Require review from Code Owners",
+       "Allow deletions of the main branch",
+       "Dismiss stale pull request approvals when new commits are pushed"
+     ], answer:[0,1,3,5],
+     hint:`Keep the settings that make the pull request a real gate. Drop the ones that let people bypass or destroy history.`,
+     why:`Required pull requests, approvals, code-owner review, required status checks and dismissing stale approvals all make the PR the only path to <code>main</code>. Allowing force pushes or deletions does the opposite: it lets history be rewritten or the branch removed.`},
+    {id:"gf4", type:"fill", title:"Complete the commands", mono:true,
+     q:`Fill in the blanks so this terminal session follows GitHub Flow.`,
+     tpl:`git [[0]] -c feature/cart-badge        # create and switch to a new branch
+git commit -m "Show item count on cart icon"
+git push [[1]] origin feature/cart-badge   # publish and set upstream
+gh pr [[2]] --base main --fill            # open the pull request`,
+     blanks:[["switch"],["-u","--set-upstream"],["create"]],
+     hint:`Modern Git creates and switches to a branch with one command and <code>-c</code>. The GitHub CLI groups pull request commands under <code>gh pr</code>.`,
+     why:`<code>git switch -c</code> creates the branch (the older equivalent is <code>git checkout -b</code>), <code>git push -u</code> publishes it and sets the upstream, and <code>gh pr create</code> opens the pull request.`},
+    {id:"gf5", type:"lines", title:"Spot what breaks GitHub Flow", prose:true,
+     q:`A team says they "do GitHub Flow". Click the <b>two</b> statements in their working agreement that contradict it.`,
+     code:[
+       "Every change starts on a new branch created from main.",
+       "Branches are named after the work, for example fix/login-timeout.",
+       "Finished features are merged into a long-lived develop branch and released from release/* branches each quarter.",
+       "Every change to main goes through a pull request with at least one review.",
+       "CI must pass before a pull request can be merged.",
+       "Urgent hotfixes are pushed straight to main without a pull request.",
+       "After merging, the branch is deleted and main is deployed."
+     ], answer:[2,5],
+     hint:`GitHub Flow has exactly one long-lived branch, and every change goes through a pull request. No exceptions.`,
+     why:`A long-lived <code>develop</code> branch with quarterly <code>release/*</code> branches is Git Flow, not GitHub Flow. Pushing hotfixes directly to <code>main</code> skips the pull request, review and CI, so it breaks both the flow and its traceability. In GitHub Flow a hotfix is just another short-lived branch with a fast pull request.`}
+  ]
+},
+/* ================================================================ 2 */
+{
+  group:"Azure Boards",
+  title:"Processes & work item types",
+  tag:"Basic · Agile · Scrum · CMMI · inheritance",
+  intro:`Every Azure DevOps project uses a <b>process</b> that defines its work item types, fields, states and backlog levels. There are four system processes. They differ mainly in what the <b>requirement</b> level is called and which extra work item types they bring.`,
+  sections:[
+    {h:"The four system processes", after:`<div class="tablewrap"><table class="ref">
+<tr><th>Process</th><th>Hierarchy (portfolio → requirement → task)</th><th>Extra types</th><th>Requirement states</th><th>Sizing field</th></tr>
+<tr><td><b>Basic</b></td><td>Epic → <b>Issue</b> → Task</td><td>(no separate Bug type)</td><td>To Do, Doing, Done</td><td>Effort</td></tr>
+<tr><td><b>Agile</b></td><td>Epic → Feature → <b>User Story</b> → Task</td><td>Bug, Issue</td><td>New, Active, Resolved, Closed, Removed</td><td>Story Points</td></tr>
+<tr><td><b>Scrum</b></td><td>Epic → Feature → <b>Product Backlog Item</b> → Task</td><td>Bug, Impediment</td><td>New, Approved, Committed, Done, Removed</td><td>Effort</td></tr>
+<tr><td><b>CMMI</b></td><td>Epic → Feature → <b>Requirement</b> → Task</td><td>Bug, Change Request, Issue, Review, Risk</td><td>Proposed, Active, Resolved, Closed</td><td>Size</td></tr>
+</table></div>
+<p>Tasks in Agile and CMMI track <b>Original Estimate, Remaining Work and Completed Work</b>. Scrum tasks track only <b>Remaining Work</b>. All processes also include the test types (Test Plan, Test Suite, Test Case, Shared Steps, Shared Parameter).</p>`},
+    {h:"Choosing one", lang:"text", code:`Small team, wants the simplest thing         → Basic
+Lean / Kanban, user stories, story points    → Agile
+Scrum ceremonies, PBIs, impediments          → Scrum
+Formal, auditable: change requests, risks,
+reviews, sign-off                            → CMMI`},
+    {h:"Customizing: the inherited process model", p:`You <b>cannot edit</b> the four system processes. To customize, create an <b>inherited process</b> (a child of Basic, Agile, Scrum or CMMI), customize it, then change your project(s) to use it. Changes apply instantly to every project on that process.`,
+     lang:"text", code:`Organization settings → Boards → Process
+  Agile (system, locked)
+   └─ Agile-Contoso (inherited)      ← customize here
+        • add custom fields (picklist, integer, identity, …)
+        • add custom work item types
+        • add custom states (mapped to a state category)
+        • add custom rules, change the form layout
+        • add custom portfolio backlog levels
+        • hide/disable inherited items you don't use
+  Project settings → change process to Agile-Contoso`,
+     after:`<p>Other models: <b>Hosted XML</b> (organizations migrated from Azure DevOps Server with customized templates) and <b>On-premises XML</b> (Azure DevOps Server). New Azure DevOps Services organizations use the <b>inherited</b> model.</p>`}
+  ],
+  tip:`Know each process's requirement-level name (<b>Issue / User Story / PBI / Requirement</b>) and the unique types: <b>Impediment</b> = Scrum, <b>Change Request / Risk / Review</b> = CMMI. "Add a field to the Bug form" always starts with <b>create an inherited process</b>, never "edit the Agile process".`,
+  exercises:[
+    {id:"pr1", type:"match", title:"Which process has this work item type?",
+     q:`Match each work item type to the system process it identifies.`,
+     choices:["Basic","Agile","Scrum","CMMI"],
+     rows:[
+       ["User Story","Agile"],
+       ["Product Backlog Item","Scrum"],
+       ["Requirement","CMMI"],
+       ["Impediment","Scrum"],
+       ["Change Request","CMMI"],
+       ["Issue as the <b>only</b> level between Epic and Task","Basic"]
+     ],
+     hint:`Each process has its own name for the requirement level. Scrum adds one extra type for blockers; CMMI adds formal types.`,
+     why:`Agile uses User Stories, Scrum uses Product Backlog Items and Impediments, CMMI uses Requirements plus Change Requests, Risks and Reviews, and Basic has just Epic → Issue → Task. Note that Agile and CMMI also have an <i>Issue</i> type, but there it's for tracking problems, not the requirement level.`},
+    {id:"pr2", type:"mc", title:"Regulated environment",
+     q:`A medical-device software team must keep an auditable record of <b>formal change requests, identified risks and design reviews</b> alongside their requirements. Which system process should the new project use?`,
+     options:["Basic","Agile","Scrum","CMMI"], answer:3,
+     hint:`Which process ships with Change Request, Risk and Review work item types out of the box?`,
+     why:`CMMI includes Change Request, Risk, Review and Issue types and a Requirement type with Proposed/Active/Resolved/Closed states, which suits formal, auditable processes. You could add such types to an inherited Agile process, but CMMI gives them to you without customization.`},
+    {id:"pr3", type:"order", title:"Scrum backlog hierarchy",
+     q:`Order the Scrum work item types from the <b>top</b> of the hierarchy to the <b>bottom</b>.`,
+     items:["Epic","Feature","Product Backlog Item","Task"],
+     hint:`Two portfolio levels, then the requirement level, then the work the team does inside a sprint.`,
+     why:`Scrum: Epic → Feature → Product Backlog Item (and Bug, depending on team settings) → Task. Epics and Features are <b>portfolio backlogs</b>, PBIs live on the <b>product backlog</b>, and Tasks appear on the <b>sprint backlog / taskboard</b>.`},
+    {id:"pr4", type:"fill", title:"States and sizing fields",
+     q:`Complete the facts about the system processes.`,
+     tpl:`A Scrum Product Backlog Item moves New → [[0]] → Committed → Done.<br>
+An Agile User Story moves New → [[1]] → Resolved → Closed.<br>
+Agile teams size User Stories in [[2]], while Scrum teams size PBIs with the [[3]] field.<br>
+Basic work items move To Do → [[4]] → Done.`,
+     blanks:[["Approved"],["Active"],["Story Points","StoryPoints","Story Point"],["Effort"],["Doing"]],
+     hint:`Scrum approves before committing; Agile items become "active"; Basic uses three plain-English states.`,
+     why:`Scrum PBI: New, Approved, Committed, Done (plus Removed). Agile User Story: New, Active, Resolved, Closed (plus Removed). Agile sizes with <b>Story Points</b>, Scrum and Basic with <b>Effort</b>, CMMI with <b>Size</b>. Basic: To Do, Doing, Done.`},
+    {id:"pr5", type:"mc", title:"Add a field to Bugs",
+     q:`Your Azure DevOps Services project uses the <b>Agile</b> system process. Product owners want a required picklist field <b>Customer Impact</b> on every Bug. What do you do?`,
+     options:[
+       "Edit the Bug type in the Agile process under Organization settings → Process",
+       "Create an inherited process from Agile, add the field to Bug, then change the project to use that process",
+       "Export the process template XML, add the field and import it into the Agile process",
+       "Create a new project with the CMMI process, because only CMMI supports custom fields"
+     ], answer:1,
+     hint:`System processes are locked. What model do Azure DevOps Services organizations customize with?`,
+     why:`System processes (Basic, Agile, Scrum, CMMI) are read-only. You create an <b>inherited process</b>, add the picklist field and a "required" setting or rule on the Bug type, and switch the project to it. XML import is for the Hosted XML / on-premises models, and every process supports custom fields once inherited.`},
+    {id:"pr6", type:"multi", title:"What an inherited process can do",
+     q:`Which of these can you do in an <b>inherited</b> process? <i>Select all that apply.</i>`,
+     options:[
+       "Add a custom field and place it on the work item form",
+       "Add a custom work item type such as Customer Request",
+       "Add a custom workflow state, e.g. In Review, mapped to a state category",
+       "Change the system Scrum process so all projects get the change",
+       "Add custom rules, e.g. make a field required when State = Resolved",
+       "Upload a modified ProcessTemplate.xml into the inherited process"
+     ], answer:[0,1,2,4],
+     hint:`Inheritance is configured through the web UI (or REST API), on a copy of a system process.`,
+     why:`Inherited processes support custom fields, custom work item types, custom states (each mapped to a category such as Proposed, In Progress, Resolved or Completed), custom rules, layout changes and custom portfolio backlog levels. The system processes themselves stay locked, and XML template uploads belong to the Hosted XML / on-premises XML models.`}
+  ]
+},
+/* ================================================================ 3 */
+{
+  group:"Azure Boards",
+  title:"Backlogs, boards & plans",
+  tag:"backlog levels · sprints · columns · WIP · delivery plans",
+  intro:`Work items appear in several views. <b>Backlogs</b> are ordered lists for planning, <b>boards</b> visualize flow, <b>sprints</b> (iterations) time-box the work, and <b>Delivery Plans</b> show several teams on one timeline.`,
+  sections:[
+    {h:"Backlog levels", lang:"text", code:`Portfolio backlogs    Epics → Features       (roll-up, long-term planning)
+Product backlog       Stories / PBIs / Requirements / Issues   (+ Bugs, if configured)
+Sprint backlog        items assigned to one iteration + their Tasks
+                      → Taskboard, Capacity, sprint Burndown`,
+     p:`Each team chooses which backlog levels it sees (<b>Team settings → Backlogs</b>), and how bugs are tracked (<b>Working with bugs</b>): <i>managed with requirements</i>, <i>managed with tasks</i>, or <i>not managed on backlogs and boards</i>. Inherited processes can add custom portfolio levels.`},
+    {h:"Areas, iterations and teams", lang:"text", code:`Project settings → Boards → Project configuration
+  Iterations:  Contoso\\Release 1\\Sprint 1 (dates) …    defined once per project
+  Areas:       Contoso\\Web, Contoso\\Mobile …
+Team settings → Team configuration
+  Iterations:  which sprints this team uses, default + backlog iteration
+  Areas:       which area paths belong to this team`},
+    {h:"Board columns, WIP limits and more", p:`Each board column maps to a workflow state; several columns can map to the same state (e.g. <i>Develop</i> and <i>Code review</i> both map to <i>Active</i>). Per column you can set:`,
+     lang:"text", code:`WIP limit              soft limit: the count turns red when exceeded, moves are NOT blocked
+Split column           "Doing" / "Done" sub-columns to show work waiting for the next stage
+Definition of done     a checklist shown on the column header
+Swimlanes              horizontal lanes, e.g. Expedite vs. Standard
+Card fields & styles   extra fields, styling rules, tag colors on cards`},
+    {h:"Delivery Plans", p:`A <b>Delivery Plan</b> shows the backlog items of <b>multiple teams</b> laid out on their sprint calendars. It visualizes <b>dependencies</b> (Predecessor/Successor links) as lines between cards and supports <b>markers</b> for key dates. Use it for cross-team roadmaps and spotting dependencies that are scheduled in the wrong order.`}
+  ],
+  tip:`WIP limits in Azure Boards are <b>advisory</b>: nothing stops you from moving a card. "Visualize work from several teams on a timeline, with dependencies" = <b>Delivery Plans</b>. Sprints are created at <b>project</b> level and then <b>selected per team</b>.`,
+  exercises:[
+    {id:"bb1", type:"mc", title:"WIP limit exceeded",
+     q:`The <i>Code review</i> column on your board has a WIP limit of 3 and already holds 3 cards. A developer drags a fourth card into it. What happens?`,
+     options:[
+       "The move is blocked until a card leaves the column",
+       "The card moves; the column count is shown in red to flag the limit is exceeded",
+       "The card moves and an approval request is sent to the team admin",
+       "The oldest card in the column is moved back automatically"
+     ], answer:1,
+     hint:`WIP limits are about making overload <i>visible</i>.`,
+     why:`Azure Boards WIP limits are soft limits. The board highlights the exceeded column (the count turns red) but doesn't prevent the move. The team is expected to react, for example by swarming on reviews.`},
+    {id:"bb2", type:"match", title:"Pick the right Azure Boards view",
+     q:`Match each need to the Azure Boards feature that serves it best.`,
+     choices:["Delivery Plans","Board (Kanban)","Taskboard","Capacity planning","Portfolio backlog","Area paths"],
+     rows:[
+       ["See four teams' features on one calendar, including cross-team dependencies","Delivery Plans"],
+       ["Visualize the flow of stories through Develop → Review → Test with WIP limits","Board (Kanban)"],
+       ["Track the tasks of the current sprint in To Do / In Progress / Done","Taskboard"],
+       ["Check whether planned work fits each person's available hours this sprint","Capacity planning"],
+       ["Order Epics and Features and see which stories roll up under them","Portfolio backlog"],
+       ["Route work items to the team that owns the mobile app","Area paths"]
+     ],
+     hint:`Multi-team = plans. Sprint tasks = taskboard. Team ownership of work = areas.`,
+     why:`Delivery Plans span teams and time. The Board shows flow and WIP. The Taskboard shows a sprint's tasks. Capacity compares remaining work with each member's available time. Portfolio backlogs manage Epics/Features. Area paths decide which team's backlog a work item lands on.`},
+    {id:"bb3", type:"mc", title:"Setting up sprints",
+     q:`A new team wants to work in two-week sprints. Sprint 1 to Sprint 6 should appear on <b>their</b> sprint backlog. What are the correct steps?`,
+     options:[
+       "Create the sprints in Team settings; they are then visible to every team automatically",
+       "Define the iterations (with dates) in Project settings → Project configuration, then select them in the team's Team configuration → Iterations",
+       "Add a custom field Sprint to the inherited process and set it on each work item",
+       "Create one Delivery Plan per sprint"
+     ], answer:1,
+     hint:`Iterations are a project-wide tree. Teams subscribe to the ones they use.`,
+     why:`Iteration paths (with start and end dates) are defined once at project level. Each team then picks which iterations it participates in, plus its default and backlog iteration. Only selected iterations show up under the team's Sprints.`},
+    {id:"bb4", type:"multi", title:"Customize the board",
+     q:`Which of these are real Azure Boards board customizations? <i>Select all that apply.</i>`,
+     options:[
+       "Split a column into Doing and Done",
+       "Add a Definition of Done checklist to a column",
+       "Add swimlanes such as Expedite",
+       "Add card styling rules, e.g. color cards with Priority = 1",
+       "Configure a WIP limit that hard-blocks moves into the column",
+       "Map two different columns to the same workflow state"
+     ], answer:[0,1,2,3,5],
+     hint:`Only one of these options is wrong, and it's about how strict a WIP limit is.`,
+     why:`Split columns, Definition of Done, swimlanes, styling rules and mapping several columns to one state are all supported. WIP limits are soft: they flag, they don't block.`},
+    {id:"bb5", type:"mc", title:"Where do bugs show up?",
+     q:`A Scrum team wants bugs to be <b>prioritized on the product backlog next to PBIs</b> and estimated with Effort, instead of being hidden or treated as tasks. What do you configure?`,
+     options:[
+       "Team settings → Working with bugs → Bugs are managed with requirements",
+       "Team settings → Working with bugs → Bugs are managed with tasks",
+       "Create a custom backlog level named Bugs in an inherited process",
+       "Add the tag bug to every PBI"
+     ], answer:0,
+     hint:`There's a team setting with three choices for bugs.`,
+     why:`"Bugs are managed with requirements" puts bugs on the product backlog alongside PBIs/stories, where they are ordered and sized like requirements. "Managed with tasks" puts them on the sprint/taskboard as children of requirements, and the third option keeps them off backlogs and boards entirely.`},
+    {id:"bb6", type:"mc", title:"Cross-team dependencies",
+     q:`The Web team's feature <i>Checkout v2</i> depends on the API team's feature <i>Payments API</i>. Management wants to see, on a timeline, whether the API feature is scheduled <b>after</b> the feature that needs it. What do you use?`,
+     options:[
+       "A Predecessor/Successor link between the two features, viewed in a Delivery Plan",
+       "A Parent/Child link, viewed on the Taskboard",
+       "A shared tag, viewed in a query",
+       "A Related link, viewed on the sprint burndown"
+     ], answer:0,
+     hint:`Delivery Plans draw dependency lines using a specific link type.`,
+     why:`Delivery Plans draw a line for each Predecessor/Successor link between cards and flag it when the successor is scheduled before its predecessor. Parent/Child is for hierarchy, not dependencies.`}
+  ]
+},
+/* ================================================================ 4 */
+{
+  group:"GitHub",
+  title:"GitHub Issues",
+  tag:"templates · forms · labels · milestones · sub-issues",
+  intro:`<b>GitHub Issues</b> track bugs, ideas and tasks inside a repository. Good intake (templates and forms) gives you better feedback, and labels, milestones, assignees, issue types and sub-issues give the work structure.`,
+  sections:[
+    {h:"Where templates live", lang:"text", code:`.github/
+├── ISSUE_TEMPLATE/
+│   ├── bug_report.yml        issue FORM (YAML, renders as a web form)
+│   ├── feature_request.md    issue TEMPLATE (Markdown + YAML front matter)
+│   └── config.yml            template chooser settings
+├── pull_request_template.md  PR template
+└── CODEOWNERS`,
+     p:`Templates placed in an organization's <code>.github</code> repository act as defaults for repositories that don't have their own.`},
+    {h:"An issue form", file:".github/ISSUE_TEMPLATE/bug_report.yml", code:`name: Bug report                     # required
+description: Report something that isn't working   # required
+title: "[Bug]: "
+labels: ["bug", "triage"]
+assignees:
+  - octocat
+body:                                # required: the form elements
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to report a bug!
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      placeholder: Steps to reproduce, expected vs. actual
+    validations:
+      required: true
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      multiple: true
+      options:
+        - Edge
+        - Chrome
+        - Firefox
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow the Code of Conduct
+          required: true`,
+     p:`Element types: <code>markdown</code>, <code>input</code>, <code>textarea</code>, <code>dropdown</code>, <code>checkboxes</code>. Every element except markdown needs <code>attributes.label</code>; <code>validations.required</code> makes it mandatory.`},
+    {h:"The template chooser", file:".github/ISSUE_TEMPLATE/config.yml", code:`blank_issues_enabled: false          # force people to pick a template
+contact_links:
+  - name: Ask a question
+    url: https://github.com/contoso/app/discussions
+    about: Questions go to Discussions, not Issues`},
+    {h:"Organizing issues", after:`<div class="tablewrap"><table class="ref">
+<tr><th>Feature</th><th>Use it for</th></tr>
+<tr><td><b>Labels</b></td><td>Categorize and filter (<code>bug</code>, <code>enhancement</code>, <code>good first issue</code>…); shared by issues and PRs in a repo</td></tr>
+<tr><td><b>Milestones</b></td><td>Group issues and PRs toward a target (a release), with an optional due date and a progress bar</td></tr>
+<tr><td><b>Assignees</b></td><td>Who owns it; up to 10 people per issue or PR</td></tr>
+<tr><td><b>Issue types</b></td><td>Organization-wide classification (e.g. Task, Bug, Feature) set by org admins</td></tr>
+<tr><td><b>Sub-issues</b></td><td>Break a large issue into child issues (nested hierarchy) and track completion on the parent</td></tr>
+</table></div>`}
+  ],
+  tip:`Issue <b>forms</b> are <code>.yml</code> files with <code>name</code>, <code>description</code> and <code>body</code>. Markdown templates are <code>.md</code> files with front matter. To stop blank issues, set <code>blank_issues_enabled: false</code> in <code>config.yml</code>. Milestones = release target with progress; labels = categories.`,
+  exercises:[
+    {id:"gi1", type:"mc", title:"Where does the form go?",
+     q:`You want a structured bug report form to appear when people click <b>New issue</b> in the <code>contoso/webshop</code> repository. Where do you save <code>bug_report.yml</code>?`,
+     options:[
+       "In the repository root",
+       "In .github/ISSUE_TEMPLATE/ on the default branch",
+       "In .github/workflows/",
+       "In docs/ISSUE_TEMPLATES/ on any branch"
+     ], answer:1,
+     hint:`Same folder as Markdown issue templates and config.yml.`,
+     why:`Issue templates and forms are read from <code>.github/ISSUE_TEMPLATE/</code> on the repository's default branch. <code>.github/workflows/</code> is for GitHub Actions.`},
+    {id:"gi2", type:"text", lang:"yaml", title:"Write an issue form",
+     q:`Write <code>.github/ISSUE_TEMPLATE/bug_report.yml</code>:
+      <ul class="tips">
+        <li><code>name</code> and <code>description</code> (any text), title prefix <code>[Bug]: </code></li>
+        <li>labels <code>bug</code> and <code>triage</code></li>
+        <li>a <code>markdown</code> element with an intro text</li>
+        <li>a required <code>textarea</code> with id <code>what-happened</code> and a label</li>
+        <li>a required <code>dropdown</code> with id <code>severity</code> and options <code>Low</code>, <code>Medium</code>, <code>High</code></li>
+        <li>an optional <code>input</code> with id <code>version</code> and a label</li>
+      </ul>`,
+     starter:`# .github/ISSUE_TEMPLATE/bug_report.yml
+`,
+     checks:[
+       {l:"Top-level name and description", t:a => a.h("name",/\S/) && a.h("description",/\S/)},
+       {l:"title starts with [Bug]:", t:a => a.h("title",/^\[Bug\]:/)},
+       {l:"labels include bug and triage", t:a => a.h("labels[]","bug") && a.h("labels[]","triage")},
+       {l:"body has a markdown element with attributes.value", t:a => a.item("body",{type:"markdown","attributes.value":/\S/})},
+       {l:"Required textarea what-happened with a label", t:a => a.item("body",{type:"textarea",id:"what-happened","attributes.label":/\S/,"validations.required":"true"})},
+       {l:"Required dropdown severity with a label", t:a => a.item("body",{type:"dropdown",id:"severity","attributes.label":/\S/,"validations.required":"true"})},
+       {l:"severity offers Low, Medium and High", t:a => ["Low","Medium","High"].every(o => a.item("body",{id:"severity","attributes.options[]":o}))},
+       {l:"input version with a label", t:a => a.item("body",{type:"input",id:"version","attributes.label":/\S/})},
+       {l:"version is not required", t:a => !a.item("body",{id:"version","validations.required":"true"})}
+     ],
+     hint:`<code>body</code> is a list; each element starts with <code>- type: …</code>. <code>id</code>, <code>attributes</code> and <code>validations</code> line up with <code>type</code>. <code>required: true</code> goes under <code>validations</code>, not under <code>attributes</code>.`,
+     solution:`name: Bug report
+description: Report something that isn't working
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting a bug! Please fill in the details below.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      placeholder: Steps to reproduce, expected and actual result
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - Low
+        - Medium
+        - High
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      placeholder: e.g. 2.4.1`,
+     why:`Issue forms turn free-text reports into structured, validated input, which improves the quality of the feedback loop. Labels from the form are applied automatically, so new bugs land in triage queries and project views without manual work.`},
+    {id:"gi3", type:"text", lang:"yaml", title:"Configure the template chooser",
+     q:`Write <code>.github/ISSUE_TEMPLATE/config.yml</code> so that:
+      <ul class="tips">
+        <li>people <b>cannot</b> open blank issues</li>
+        <li>a contact link named <code>Security issue</code> points to <code>https://contoso.com/security</code> with an <code>about</code> text</li>
+      </ul>`,
+     starter:`# .github/ISSUE_TEMPLATE/config.yml
+`,
+     checks:[
+       {l:"blank_issues_enabled: false", t:a => a.h("blank_issues_enabled","false")},
+       {l:"contact_links item named Security issue", t:a => a.item("contact_links",{name:/^Security issue$/i})},
+       {l:"…with url https://contoso.com/security", t:a => a.item("contact_links",{name:/security/i,url:/^https:\/\/contoso\.com\/security\/?$/i})},
+       {l:"…and an about text", t:a => a.item("contact_links",{name:/security/i,about:/\S/})}
+     ],
+     hint:`Two top-level keys. <code>contact_links</code> is a list of mappings with <code>name</code>, <code>url</code> and <code>about</code>.`,
+     solution:`blank_issues_enabled: false
+contact_links:
+  - name: Security issue
+    url: https://contoso.com/security
+    about: Please report security vulnerabilities privately, not as public issues.`,
+     why:`<code>blank_issues_enabled: false</code> removes the "Open a blank issue" option, so every report goes through a template or form. Contact links send people to the right channel (security reporting, Discussions, support) instead of the issue tracker.`},
+    {id:"gi4", type:"lines", title:"Spot the errors in the form",
+     q:`This issue form fails validation. Click the <b>two</b> faulty lines.`,
+     code:[
+       "name: Feature request",
+       "description: Suggest an idea for this project",
+       "labels: [enhancement]",
+       "body:",
+       "  - type: text",
+       "    id: summary",
+       "    attributes:",
+       "      label: Summary",
+       "      required: true",
+       "  - type: textarea",
+       "    id: details",
+       "    attributes:",
+       "      label: Details",
+       "    validations:",
+       "      required: true"
+     ], answer:[4,8],
+     hint:`Check the list of valid element types, and where "required" belongs.`,
+     why:`There's no <code>text</code> element type: single-line text is <code>type: input</code> (the others are markdown, textarea, dropdown, checkboxes). And <code>required: true</code> belongs under <code>validations:</code>, not under <code>attributes:</code>, as the textarea element shows. (Inside <code>checkboxes</code> options, <code>required</code> is set per option, which is a different case.)`},
+    {id:"gi5", type:"match", title:"Labels, milestones, sub-issues…",
+     q:`Match each need to the GitHub Issues feature that fits it.`,
+     choices:["Labels","Milestone","Sub-issues","Assignees","Issue types","Issue form"],
+     rows:[
+       ["Track all issues and PRs planned for v3.0, with a due date and percent complete","Milestone"],
+       ["Mark issues as good first issue or needs-triage for filtering","Labels"],
+       ["Split the epic-sized issue \"New checkout\" into child issues and see progress on the parent","Sub-issues"],
+       ["Make it clear that Priya and Tom own the fix","Assignees"],
+       ["Classify every issue in the organization as Bug, Feature or Task consistently","Issue types"],
+       ["Force bug reporters to fill in reproduction steps","Issue form"]
+     ],
+     hint:`One of these is defined at organization level, one is about a release target with a date.`,
+     why:`Milestones group issues and PRs toward a dated target and show progress. Labels are free-form categories. Sub-issues build a parent/child hierarchy with progress tracking. Assignees name the owners. Issue types are an organization-wide classification. Issue forms with <code>validations.required</code> enforce input.`},
+    {id:"gi6", type:"mc", title:"Breaking down big work",
+     q:`A maintainer has an issue "Redesign onboarding" that's too big for one PR. She wants each piece to be its own issue that can be assigned and closed separately, while the original issue shows how many pieces are done. What should she use?`,
+     options:[
+       "Add a label onboarding to every related issue",
+       "Create sub-issues under the original issue",
+       "Put the pieces in the issue body as plain bullet points",
+       "Create a milestone called Redesign onboarding and close the original issue"
+     ], answer:1,
+     hint:`You need a real parent/child relationship between issues.`,
+     why:`Sub-issues create a parent/child hierarchy between issues. Each child is a full issue (assignees, labels, its own PRs), and the parent shows sub-issue progress, which GitHub Projects can also display as a field. A label or milestone groups issues but doesn't express hierarchy.`}
+  ]
+},
+/* ================================================================ 5 */
+{
+  group:"GitHub",
+  title:"GitHub Projects",
+  tag:"views · custom fields · built-in workflows",
+  intro:`<b>GitHub Projects</b> is a flexible planning tool that sits <b>on top of issues and pull requests</b> from one or more repositories. A project belongs to a user or an organization, and it can hold draft items that aren't issues yet.`,
+  sections:[
+    {h:"Views and layouts", after:`<div class="tablewrap"><table class="ref">
+<tr><th>Layout</th><th>Shows</th><th>Typical options</th></tr>
+<tr><td><b>Table</b></td><td>Spreadsheet of items and fields</td><td>Group by, sort, filter, slice by, field sums</td></tr>
+<tr><td><b>Board</b></td><td>Cards in columns (by Status or another single-select / iteration field)</td><td>Column limits, group by, sort, filter</td></tr>
+<tr><td><b>Roadmap</b></td><td>Items on a timeline</td><td>Needs <b>date</b> or <b>iteration</b> fields for start/target; zoom levels, markers</td></tr>
+</table></div>
+<p>Every view saves its own layout, filter, grouping and sorting, so different audiences can share one project (e.g. "Current sprint" board, "Bugs by priority" table, "Q3 roadmap").</p>`},
+    {h:"Fields", lang:"text", code:`Built-in   Title · Assignees · Status · Labels · Milestone · Repository
+           Linked pull requests · Reviewers · Parent issue · Sub-issue progress · Type
+Custom     Text           free text            e.g. Customer
+           Number         numeric (sums!)      e.g. Estimate
+           Date           a date               e.g. Target date
+           Single select  one of a list        e.g. Priority: P0 / P1 / P2
+           Iteration      time-boxed cycles    e.g. Sprint (2 weeks, with breaks)`},
+    {h:"Built-in workflows (automation)", lang:"text", code:`Item added to project     → set Status (e.g. Todo)
+Item reopened             → set Status
+Item closed               → set Status to Done        (on by default)
+Pull request merged       → set Status to Done        (on by default)
+Code changes requested / Code review approved → set Status
+Auto-close issue          → close the issue when Status is set to Done
+Auto-add to project       → add new matching items from a repo, e.g. is:issue label:bug
+Auto-archive items        → archive items matching a filter, e.g. is:closed updated:<@today-2w`,
+     p:`For anything beyond that, use <b>GitHub Actions</b> with the <b>GraphQL API</b> (ProjectV2) or the <code>actions/add-to-project</code> action. Projects also have <b>Insights</b> charts and <b>status updates</b>.`}
+  ],
+  tip:`Sprint planning in Projects = an <b>Iteration</b> field. Timeline = <b>Roadmap</b> layout (needs date/iteration fields). "Automatically set Done when the PR merges" = the <b>Pull request merged</b> built-in workflow. "Add every new bug from repo X automatically" = <b>Auto-add to project</b> with a filter.`,
+  exercises:[
+    {id:"gp1", type:"match", title:"Pick the layout",
+     q:`Match each request to the GitHub Projects layout you would create a view with.`,
+     choices:["Table","Board","Roadmap"],
+     rows:[
+       ["Leadership wants to see features plotted against target dates for the next two quarters","Roadmap"],
+       ["The team wants a Todo / In progress / Done view for stand-up with a column limit","Board"],
+       ["The PM wants to bulk-edit Priority and see the sum of Estimate per assignee","Table"],
+       ["Show which sprint each item falls in, along a timeline","Roadmap"]
+     ],
+     hint:`Timeline → one layout. Columns → another. Spreadsheet-like editing and sums → the third.`,
+     why:`Roadmap plots items using date or iteration fields. Board shows columns (with optional limits) for flow. Table is the spreadsheet view with grouping and field sums.`},
+    {id:"gp2", type:"fill", title:"Choose custom field types",
+     q:`Type the custom field type you would create for each field (Text, Number, Date, Single select or Iteration).`,
+     tpl:`Sprint, two-week cycles with a break over the holidays → [[0]]<br>
+Priority with values P0, P1, P2 → [[1]]<br>
+Estimate in points that should be summed per group → [[2]]<br>
+Launch date → [[3]]<br>
+Customer name (free text) → [[4]]`,
+     blanks:[["Iteration"],["Single select","Single-select","SingleSelect"],["Number"],["Date"],["Text"]],
+     hint:`There are exactly five custom field types, and each answer uses a different one.`,
+     why:`Iteration fields model time-boxed cycles (with configurable duration and breaks), single select gives a fixed list of options, number supports sums, date drives roadmaps, and text holds free text.`},
+    {id:"gp3", type:"multi", title:"Built-in workflows",
+     q:`Which of these are <b>built-in workflows</b> in GitHub Projects (configured under the project's Workflows menu, no Actions needed)? <i>Select all that apply.</i>`,
+     options:[
+       "Item closed → set Status",
+       "Pull request merged → set Status",
+       "Auto-add to project (from a repository, with a filter)",
+       "Auto-archive items",
+       "Auto-assign a reviewer when an item moves to In review",
+       "Deploy to production when Status changes to Done"
+     ], answer:[0,1,2,3],
+     hint:`Built-in workflows change project fields, add items, archive items or close issues. They don't run deployments or request reviews.`,
+     why:`Item closed, Pull request merged, Item added, Item reopened, Code review approved/changes requested, Auto-close issue, Auto-add and Auto-archive are built in. Requesting reviewers or deploying needs GitHub Actions (or CODEOWNERS for reviews).`},
+    {id:"gp4", type:"fill", title:"Auto-add filter", mono:true,
+     q:`Configure the <b>Auto-add to project</b> workflow so that only <b>issues</b> (not PRs) with the label <b>bug</b> from <code>contoso/webshop</code> are added. Complete the filter.`,
+     tpl:`Repository: contoso/webshop
+Filter:     [[0]] [[1]]`,
+     blanks:[["is:issue"],["label:bug","label:\"bug\""]],
+     hint:`Same qualifier syntax as the issue search bar: <code>is:</code> and <code>label:</code>.`,
+     why:`Auto-add uses issue-search style filters: <code>is:issue label:bug</code>. It adds matching items when they are created or updated. Existing items aren't added retroactively, so bulk-add those once by hand.`},
+    {id:"gp5", type:"mc", title:"The card that didn't move",
+     q:`An issue was closed by a merged PR (<code>Closes #42</code>), but its card in the project still shows Status = <i>In progress</i>. Other items behave the same way. What's the most likely cause?`,
+     options:[
+       "Closing keywords don't work for issues that belong to a project",
+       "The built-in workflows Item closed / Pull request merged were disabled in this project",
+       "The issue needs the label done before Projects can update it",
+       "Projects can only update the Status of draft items"
+     ], answer:1,
+     hint:`Something that is normally enabled by default isn't doing its job.`,
+     why:`The <b>Item closed</b> and <b>Pull request merged</b> workflows set Status to Done and are on by default. If someone turned them off (or changed their target value), closed items keep their old Status. Re-enable them under the project's Workflows.`}
+  ]
+},
+/* ================================================================ 6 */
+{
+  group:"Feedback",
+  title:"Feedback cycles & notifications",
+  tag:"subscriptions · watching · mentions · stakeholders",
+  intro:`A fast <b>feedback cycle</b> means the right people hear about the right events quickly: a failed build, a review request, a new bug from a customer. Too few notifications hide problems; too many get ignored. Both Azure DevOps and GitHub let you tune this per person and per team.`,
+  sections:[
+    {h:"Azure DevOps notification subscriptions", lang:"text", code:`Personal      User settings → Notifications   (your own subscriptions; opt out of defaults)
+Team          Team settings → Notifications   (deliver to team members, a custom email
+                                               address / distribution list, …)
+Project       Project settings → Notifications
+Organization  Organization settings → Notifications  (default subscriptions, delivery settings)
+
+A subscription = event (work item changed, build completes, PR created, deployment
+approval pending, …) + filter criteria (area path, field values, branch …) + delivery`,
+     p:`Other feedback paths in Azure DevOps: <b>Follow</b> a work item or PR to get updates, <b>@mention</b> someone in a discussion, and <b>service hooks</b> to push events to Teams, Slack or a webhook.`},
+    {h:"Mentions", lang:"text", code:`Azure DevOps (work item discussion, PR comments)
+  @Priya Sharma      notifies the person
+  #1234              links work item 1234
+  !87                links pull request 87
+
+GitHub (issues, PRs, discussions, commits)
+  @octocat           notifies the user
+  @contoso/web-team  notifies the team (org teams)
+  #42                references issue/PR 42 in this repo
+  contoso/api#7      references an issue in another repo`},
+    {h:"GitHub watching and notifications", lang:"text", code:`Watch a repository:
+  Participating and @mentions   (default) only threads you take part in
+  All Activity                  every issue, PR, release, discussion
+  Ignore                        nothing, not even @mentions
+  Custom                        pick: Issues · Pull requests · Releases · Discussions · Security alerts
+
+You're "participating" when you: are @mentioned (or your team is), are assigned,
+are requested for review, opened the thread, or commented on it.
+Delivery: web inbox (github.com/notifications), email, GitHub Mobile.`,
+     p:`<b>CODEOWNERS</b> closes another feedback loop: when a PR touches files you own, you are <b>automatically requested for review</b>, and with branch protection you can require code-owner approval.`},
+    {h:"Stakeholder feedback", p:`Bring business users into the loop without paid licenses: Azure DevOps <b>Stakeholder</b> access is free and lets people view and add work items and use boards (but not code). On GitHub, use <b>issue forms</b> for structured reports and <b>Discussions</b> for open-ended questions and ideas, keeping the issue tracker for actionable work. Demo working software every sprint and capture the feedback as new backlog items.`}
+  ],
+  tip:`"Notify the whole team when a build on main fails" = a <b>team</b> subscription with a branch filter, not N personal ones. "Business users must add and view work items for free" = <b>Stakeholder</b> access. In GitHub, <b>Ignore</b> suppresses even @mentions; <b>Custom</b> is how you watch only releases or security alerts.`,
+  exercises:[
+    {id:"fb1", type:"match", title:"GitHub watch settings",
+     q:`Match each wish to the repository <b>Watch</b> setting that achieves it.`,
+     choices:["Participating and @mentions","All Activity","Ignore","Custom"],
+     rows:[
+       ["Hear about every new issue, PR and comment in the repo","All Activity"],
+       ["Only hear about threads I comment on, am assigned to or am @mentioned in","Participating and @mentions"],
+       ["Only get notified when a new release is published (plus my own threads)","Custom"],
+       ["Stop all notifications from this repo, including @mentions","Ignore"]
+     ],
+     hint:`One of these is the default; one lets you pick event types.`,
+     why:`Participating and @mentions is the default. All Activity follows everything. Custom adds selected event types (Issues, Pull requests, Releases, Discussions, Security alerts) on top of participating. Ignore silences the repo completely, @mentions included.`},
+    {id:"fb2", type:"multi", title:"When are you participating?",
+     q:`You watch a repo with the default setting. Which events will notify you? <i>Select all that apply.</i>`,
+     options:[
+       "Someone writes @you in a comment on an issue",
+       "You're assigned to an issue",
+       "Someone requests your review on a pull request",
+       "Someone mentions @contoso/web-team, a team you belong to",
+       "Someone stars the repository",
+       "Someone opens an issue you have never interacted with"
+     ], answer:[0,1,2,3],
+     hint:`Default = Participating and @mentions. Stars never notify.`,
+     why:`Direct mentions, team mentions, assignment and review requests all make you a participant. Stars don't generate notifications, and a brand-new issue you're not involved in only notifies people watching All Activity (or Custom → Issues).`},
+    {id:"fb3", type:"mc", title:"Failed builds on main",
+     q:`In Azure DevOps, every member of the <b>Web</b> team, and the distribution list <code>web-oncall@contoso.com</code>, must get an email when a build of the <code>main</code> branch fails. Members joining the team later should be included automatically. What do you configure?`,
+     options:[
+       "A personal subscription for each team member",
+       "A team subscription in the Web team's notification settings for Build completes, filtered on status Failed and branch main, delivered to team members and the custom address",
+       "A service hook to Microsoft Teams",
+       "A branch policy on main with Notify on failure enabled"
+     ], answer:1,
+     hint:`Who owns the subscription determines who receives it as the team changes.`,
+     why:`A <b>team subscription</b> follows team membership automatically and can also deliver to a custom email address such as a distribution list. Personal subscriptions don't scale, a service hook posts to a channel rather than emailing people, and branch policies don't send build-failure notifications.`},
+    {id:"fb4", type:"fill", title:"Mention syntax in Azure DevOps", mono:true,
+     q:`Complete this Azure DevOps work item comment so that it notifies Priya, links work item 2048 and links pull request 311.`,
+     tpl:`[[0]]Priya Sharma can you check whether [[1]]2048 is fixed by [[2]]311?`,
+     blanks:[["@"],["#"],["!"]],
+     hint:`Person, work item, pull request: three different single characters.`,
+     why:`In Azure DevOps discussions and PR comments, <code>@</code> mentions a person (and emails them), <code>#ID</code> links a work item, and <code>!ID</code> links a pull request.`},
+    {id:"fb5", type:"mc", title:"Feedback from the business",
+     q:`Ten people from Marketing need to <b>view the board, add feature requests as work items and comment on them</b> in a private Azure DevOps project. They never touch code. The company doesn't want to buy Basic licenses for them. Which access level do you assign?`,
+     options:["Basic","Basic + Test Plans","Stakeholder","Visual Studio Subscriber"], answer:2,
+     hint:`There's a free access level designed for exactly this.`,
+     why:`<b>Stakeholder</b> access is free and lets users view and work with work items and boards, which is enough to give feedback and add requests, but not access to repos, so it fits non-technical contributors. Basic is a paid license for developers.`},
+    {id:"fb6", type:"text", lang:"text", title:"Route reviews with CODEOWNERS",
+     q:`Write <code>.github/CODEOWNERS</code> so that:
+      <ul class="tips">
+        <li><code>@contoso/core</code> owns everything by default</li>
+        <li><code>@contoso/docs</code> owns everything under <code>/docs/</code></li>
+        <li>every <code>*.tf</code> file is owned by <b>both</b> <code>@contoso/platform</code> and <code>@maria</code></li>
+      </ul>
+      Remember: when several patterns match, the <b>last matching line wins</b>.`,
+     starter:`# .github/CODEOWNERS
+`,
+     checks:[
+       {l:"A default line: * @contoso/core", t:a => a.lines.some(l => /^\*\s+@contoso\/core\s*$/.test(l))},
+       {l:"/docs/ owned by @contoso/docs", t:a => a.lines.some(l => /^\/?docs\/(\*\*)?\s+@contoso\/docs\s*$/.test(l))},
+       {l:"*.tf owned by @contoso/platform and @maria", t:a => a.lines.some(l => /^(\*\*\/)?\*\.tf\s+/.test(l) && /\s@contoso\/platform(\s|$)/.test(l) && /\s@maria(\s|$)/.test(l))},
+       {l:"The * default comes first (otherwise it overrides everything)", t:a => { const i = a.lines.findIndex(l => /^\*\s/.test(l)); return i >= 0 && a.lines.every((l, k) => k <= i || !/^\*\s/.test(l)) && a.lines.slice(0, i).every(l => !/@/.test(l)); }}
+     ],
+     hint:`One rule per line: <code>pattern owner1 owner2</code>. Put the catch-all <code>*</code> at the top so the more specific rules below it win.`,
+     solution:`# Default owners for everything
+*        @contoso/core
+
+# Documentation
+/docs/   @contoso/docs
+
+# Terraform files anywhere in the repo
+*.tf     @contoso/platform @maria`,
+     why:`CODEOWNERS uses gitignore-style patterns and the <b>last</b> matching pattern takes precedence, so the catch-all goes first. Code owners are automatically requested for review when a PR touches their files, and the branch protection setting "Require review from Code Owners" turns that into a required approval.`}
+  ]
+},
+/* ================================================================ 7 */
+{
+  group:"Traceability",
+  title:"Linking work to code",
+  tag:"AB# · closing keywords · branches · PRs",
+  intro:`Traceability starts with linking: every branch, commit and pull request should point at the work item or issue it implements. Both platforms can create these links <b>from text you type anyway</b>, such as commit messages and PR descriptions.`,
+  sections:[
+    {h:"GitHub issues: closing keywords", lang:"text", code:`close  closes  closed
+fix    fixes   fixed
+resolve resolves resolved
+
+Closes #42                      issue in the same repo
+Fixes contoso/api#7             issue in another repo
+Closes #15, closes #18          one keyword PER issue
+Related to #20                  just a reference, does not close`,
+     p:`Put the keyword in the <b>pull request description</b> (or in a commit message). The issue closes when the PR is merged <b>into the default branch</b>. A PR into any other branch only creates a reference. You can also link a PR to an issue manually from the <b>Development</b> section of either one, and create a branch for an issue from there.`},
+    {h:"GitHub repos + Azure Boards: AB#", lang:"text", code:`Prerequisite: install the Azure Boards app for GitHub and connect the repo
+              to the Azure DevOps project (Project settings → GitHub connections)
+
+AB#1234            in a commit message, PR title or PR description → link
+Fixes AB#1234      also moves the work item to Done (its "Completed" state)
+                   when the pull request is merged`,
+     p:`The links show up in the work item's <b>Development</b> section as GitHub commits and GitHub pull requests. You can also add them by hand with <b>Add link</b>. Without the connection, <code>AB#1234</code> is just text.`},
+    {h:"Azure Repos + Azure Boards", lang:"text", code:`Work item → Development → Create branch          branch is linked automatically
+Commit message "#1234"                            linked (repo setting: Commit mention linking)
+Commit message "Fixes #1234"                      can complete it on merge to the default
+                                                  branch (Commit mention work item resolution)
+PR → Work items panel                             link items to the PR
+Branch policy: Check for linked work items        Required = no PR without a linked item
+Complete PR: Complete associated work items       transition linked items on merge`}
+  ],
+  tip:`GitHub ↔ Azure Boards = <b>AB#ID</b>, and only after the <b>Azure Boards app</b> connects the repo. Closing GitHub issues = <b>close/fix/resolve</b> keywords, and only for PRs into the <b>default branch</b>. "Every PR in Azure Repos must reference a work item" = branch policy <b>Check for linked work items: Required</b>.`,
+  exercises:[
+    {id:"lk1", type:"text", lang:"text", title:"Commit message with AB#",
+     q:`Your code is in GitHub and the repo is connected to Azure Boards. Write a commit message for a fix to the cart total rounding that <b>links to work item 412</b> and <b>moves it to Done</b> when the pull request merges. Use a summary line plus the link.`,
+     starter:``,
+     checks:[
+       {l:"Has a summary line describing the change", t:a => a.lines.length > 0 && /[a-z]{3,}/i.test(a.lines[0].replace(/\b\w+\s+AB#\d+/gi, ""))},
+       {l:"Uses a state-changing keyword: Fix / Fixes / Fixed AB#412", t:a => /\bfix(e[sd])?:?\s+AB#412\b/i.test(a.src)},
+       {l:"Every #412 is written as AB#412 (a bare #412 would mean a GitHub issue)", t:a => !/(^|[^B])#412\b/i.test(a.src.replace(/AB#412/gi, ""))}
+     ],
+     hint:`Format: <code>Fixes AB#412</code>. Without <code>AB</code> in front, GitHub reads <code>#412</code> as an issue in the repo.`,
+     solution:`Round cart totals to two decimals before tax
+
+Fixes AB#412`,
+     why:`<code>AB#412</code> creates the GitHub commit link on work item 412. Prefixing it with <code>fix</code>, <code>fixes</code> or <code>fixed</code> also transitions the work item to its done state when the PR merges. A plain <code>#412</code> is a GitHub issue reference and does nothing in Azure Boards.`},
+    {id:"lk2", type:"text", lang:"text", title:"PR description that closes issues",
+     q:`Write a pull request description (the PR targets <code>main</code>, the default branch) that:
+      <ul class="tips">
+        <li><b>closes</b> issues <code>#15</code> and <code>#18</code> when merged</li>
+        <li><b>mentions</b> issue <code>#20</code> without closing it</li>
+      </ul>`,
+     starter:``,
+     checks:[
+       {l:"#15 is preceded by a closing keyword", t:a => new RegExp("\\b" + KW + ":?\\s+#15\\b", "i").test(a.src)},
+       {l:"#18 is preceded by its own closing keyword", t:a => new RegExp("\\b" + KW + ":?\\s+#18\\b", "i").test(a.src)},
+       {l:"#20 is mentioned", t:a => /#20\b/.test(a.src)},
+       {l:"#20 is NOT preceded by a closing keyword", t:a => !new RegExp("\\b" + KW + ":?\\s+#20\\b", "i").test(a.src)}
+     ],
+     hint:`Each issue you want closed needs its own keyword: <code>Closes #15, closes #18</code>. <code>Closes #15, #18</code> only closes #15.`,
+     solution:`Adds input validation to the signup form.
+
+Closes #15, closes #18
+Related to #20 (follow-up for the mobile app)`,
+     why:`A closing keyword applies only to the issue reference directly after it, so each issue needs its own keyword. Any other mention (<code>Related to #20</code>, <code>see #20</code>) creates a cross-reference in the issue's timeline without closing it.`},
+    {id:"lk3", type:"mc", title:"Why is the issue still open?",
+     q:`A PR description says <code>Fixes #22</code>. The PR was approved and merged into <code>develop</code>. The repository's default branch is <code>main</code>. Issue #22 is still open. Why?`,
+     options:[
+       "Fixes is not a valid closing keyword; only Closes works",
+       "Closing keywords only take effect when the PR is merged into the default branch",
+       "The issue must be assigned to the PR author first",
+       "Closing keywords only work in commit messages, not in PR descriptions"
+     ], answer:1,
+     hint:`Check which branch the PR went into.`,
+     why:`Issues are closed automatically only when the linked PR is merged into the repository's <b>default</b> branch. It closes once <code>develop</code> is merged into <code>main</code> through a PR that carries the keyword, or you can close it by hand. <code>fix</code>/<code>fixes</code>/<code>fixed</code> are valid keywords, and they work in PR descriptions and commit messages.`},
+    {id:"lk4", type:"lines", title:"Which commits won't link?", prose:true,
+     q:`The GitHub repo is connected to Azure Boards. Click <b>every</b> commit message that will <b>not</b> link to Azure Boards work item 77.`,
+     code:[
+       "Add retry policy to payment client AB#77",
+       "Fix null check in basket (AB 77)",
+       "Fixes AB#77: handle empty cart",
+       "Refactor logging #77",
+       "Update docs, see AB#77 and AB#80",
+       "Bump package version AB-77"
+     ], answer:[1,3,5],
+     hint:`Only one exact syntax creates the link: <code>AB#</code> followed by the ID.`,
+     why:`Only <code>AB#77</code> is recognized. <code>AB 77</code> and <code>AB-77</code> are plain text, and <code>#77</code> refers to GitHub issue 77 in the same repo. One message can link several work items (<code>AB#77 and AB#80</code>).`},
+    {id:"lk5", type:"mc", title:"No PR without a work item",
+     q:`Auditors require that every change merged into <code>main</code> in your <b>Azure Repos</b> repository can be traced to a work item. How do you enforce this?`,
+     options:[
+       "Enable the branch policy Check for linked work items on main and set it to Required",
+       "Add a pipeline step that fails if the commit message has no #",
+       "Enable Commit mention linking in the repository settings",
+       "Create a team notification subscription for pull requests without work items"
+     ], answer:0,
+     hint:`Look for the option that actually blocks the merge.`,
+     why:`The <b>Check for linked work items</b> branch policy set to <b>Required</b> blocks PR completion until at least one work item is linked. Commit mention linking only creates links when people remember to type them, and a notification doesn't block anything.`},
+    {id:"lk6", type:"match", title:"How does the link get there?",
+     q:`Match each situation to the mechanism that creates the link (or closes the item).`,
+     choices:["AB#ID mention","Closing keyword (Closes #ID)","Create branch from the work item","Commit mention #ID in Azure Repos","Complete associated work items on PR completion"],
+     rows:[
+       ["Link a GitHub pull request to Azure Boards work item 950","AB#ID mention"],
+       ["Close GitHub issue 31 when the PR merges into main","Closing keyword (Closes #ID)"],
+       ["Start work on story 1200 in Azure Repos with the branch already linked","Create branch from the work item"],
+       ["Link an Azure Repos commit to work item 88 from the commit message","Commit mention #ID in Azure Repos"],
+       ["Move the Azure Repos PR's linked stories to Closed when it's merged","Complete associated work items on PR completion"]
+     ],
+     hint:`GitHub → Azure Boards needs a prefix. GitHub issues use keywords. Azure Repos uses plain #ID and the PR completion dialog.`,
+     why:`<code>AB#ID</code> links GitHub commits/PRs to Azure Boards. Closing keywords close GitHub issues. The Development section of a work item can create an already-linked branch. In Azure Repos, <code>#ID</code> in a commit message links (when Commit mention linking is on), and the PR completion option transitions linked work items.`},
+    {id:"lk7", type:"mc", title:"The missing link",
+     q:`Developers put <code>AB#1500</code> in commit messages on a GitHub repository, but nothing appears in the work item's Development section. Other repos in the same GitHub organization link fine. What's the most likely cause?`,
+     options:[
+       "The repository isn't connected to the Azure DevOps project through the Azure Boards app",
+       "AB# only works in PR titles, not commit messages",
+       "Work item 1500 must be in the Active state first",
+       "The commits must be signed"
+     ], answer:0,
+     hint:`AB# is processed by an integration that is configured per repository.`,
+     why:`The Azure Boards app must have access to the repository <b>and</b> the repo must be added to the project's GitHub connection. Only then are <code>AB#</code> mentions in commits, PR titles and PR descriptions turned into links.`}
+  ]
+},
+/* ================================================================ 8 */
+{
+  group:"Traceability",
+  title:"End-to-end traceability",
+  tag:"requirement → commit → build → test → release",
+  intro:`Traceability answers two questions in both directions. <b>Forward:</b> "Where is this requirement? Is it built, tested and released?" <b>Backward:</b> "This production bug came from which change, which build, which requirement?" The links you created in the previous module are the chain.`,
+  sections:[
+    {h:"The chain in Azure DevOps", lang:"text", code:`Epic → Feature → User Story           Parent/Child links
+  └ Test Case                         Tested By / Tests  (requirement-based test suite)
+  └ Branch · Commit · Pull Request    Development links  (AB#, #ID, Create branch, PR panel)
+      └ Build / pipeline run          "Integrated in build"; run shows linked work items
+          └ Test results              linked to test cases / requirements
+              └ Release / deployment  Deployment control on the work item form
+Bug                                   "Found in build", Related to the story, created from a failed test`},
+    {h:"Useful link types", after:`<div class="tablewrap"><table class="ref">
+<tr><th>Link type</th><th>Meaning</th></tr>
+<tr><td>Parent / Child</td><td>Hierarchy (Feature → Story → Task)</td></tr>
+<tr><td>Predecessor / Successor</td><td>Dependency (shown in Delivery Plans)</td></tr>
+<tr><td>Related</td><td>Loose association</td></tr>
+<tr><td>Duplicate / Duplicate Of</td><td>Same work reported twice</td></tr>
+<tr><td>Tested By / Tests</td><td>Requirement ↔ Test Case</td></tr>
+<tr><td>Found in build / Integrated in build</td><td>Bug found in a build / work included in a build</td></tr>
+<tr><td>Branch, Commit, Pull Request, GitHub Commit, GitHub Pull Request</td><td>Development links to code</td></tr>
+</table></div>`},
+    {h:"Quality traceability", p:`Add test cases to <b>requirement-based suites</b> in Azure Test Plans: they get <i>Tested By</i> links automatically. Automated test results from pipelines can be linked to requirements, and the <b>Requirements quality</b> dashboard widget shows pass/fail per requirement. From a failed test in a pipeline run's <b>Tests</b> tab you can create a <b>Bug</b> that carries the build and test details. Pipelines can link the work items of the commits in each run (the pipeline setting <i>Automatically link work items included in this run</i>), and the work item form's <b>Deployment</b> control shows which environments the work has reached.`},
+    {h:"The chain on GitHub", lang:"text", code:`Issue (with sub-issues, in a Project)
+  └ Branch created from the issue (Development section)
+      └ Commits → Pull request "Closes #42"   review, required checks (Actions)
+          └ Workflow run for the merge commit (SHA, logs, artifacts)
+              └ Deployment to an environment   (deployment history per environment)
+                  └ Release with generated notes listing the merged PRs`}
+  ],
+  tip:`"Which requirements have passing tests?" = test cases linked to requirements + <b>Requirements quality</b> widget / requirement-based suites. "Create a bug from a failed automated test with build info" = the run's <b>Tests</b> tab → create bug. "Every change must trace to a requirement" = <b>required linked work items</b> policy + consistent AB#/#ID linking.`,
+  exercises:[
+    {id:"tr1", type:"order", title:"Follow the chain",
+     q:`Put the traceability chain in order, from the requirement to production.`,
+     items:[
+       "User Story 1234 is approved on the backlog",
+       "A branch is created from the story and commits reference it",
+       "A pull request linked to the story is reviewed and merged",
+       "The CI pipeline run builds the merge commit and links the story",
+       "Automated test results from the run are linked to the story's test cases",
+       "The release deploys the build; the story's Deployment control shows the environment"
+     ],
+     hint:`Requirement → code → review → build → test → release.`,
+     why:`Each step adds a link: story → branch/commits → PR → build ("Integrated in build") → test results → deployment. If any link is missing, you can't answer "is story 1234 in production?" without asking people.`},
+    {id:"tr2", type:"match", title:"Pick the link type",
+     q:`Match each relationship to the Azure Boards link type you would use.`,
+     choices:["Parent/Child","Predecessor/Successor","Tested By/Tests","Found in build","Duplicate/Duplicate Of","Related"],
+     rows:[
+       ["Feature F1 contains User Stories S1–S5","Parent/Child"],
+       ["Test Case TC9 verifies User Story S3","Tested By/Tests"],
+       ["Story S4 can't start until the API team finishes S8","Predecessor/Successor"],
+       ["Bug B2 was discovered in build 20261124.3","Found in build"],
+       ["Bug B7 reports the same problem as Bug B2","Duplicate/Duplicate Of"],
+       ["Story S5 is loosely connected to an old spike","Related"]
+     ],
+     hint:`Hierarchy, verification, ordering, origin build, sameness, and "just related".`,
+     why:`Parent/Child builds the hierarchy, Tested By/Tests connects requirements to test cases (quality traceability), Predecessor/Successor models dependencies, Found in build ties a bug to the build where it surfaced, Duplicate marks repeats, and Related is the generic link.`},
+    {id:"tr3", type:"mc", title:"From failed test to bug",
+     q:`An automated test fails in a pipeline run. A tester wants a Bug that already contains the <b>build</b> and <b>test failure details</b> and links to the test result, without copying anything by hand. What should she do?`,
+     options:[
+       "Open the run's Tests tab, select the failed test and create a bug from it",
+       "Create a bug on the backlog and paste the log into Repro Steps",
+       "Add a notification subscription for failed tests",
+       "Re-run the pipeline with system.debug set to true"
+     ], answer:0,
+     hint:`Start from the test result itself.`,
+     why:`Creating the bug from the failed result in the <b>Tests</b> tab pre-fills it with the error message, stack trace and build information, and links it to the run's test result. That gives backward traceability from the bug to the exact build.`},
+    {id:"tr4", type:"mc", title:"Proof of tested requirements",
+     q:`Before a release, the QA lead must show <b>which user stories have passing tests and which don't</b>, on a dashboard. Automated tests run in Azure Pipelines. What setup gives this view?`,
+     options:[
+       "Link tests to the requirements (requirement-based suites / linking automated test results to the stories) and add the Requirements quality widget",
+       "Add the Build history widget to the dashboard",
+       "Tag every passing story with tested",
+       "Create a Delivery Plan per release"
+     ], answer:0,
+     hint:`The dashboard needs a link between tests and requirements to report on.`,
+     why:`Requirement-level quality only works if tests are linked to requirements. With that in place, the <b>Requirements quality</b> widget (and Test Plans' requirement-based suites) show pass/fail per requirement. Build history shows pipeline results, not requirement coverage.`},
+    {id:"tr5", type:"multi", title:"Traceability on GitHub",
+     q:`Your team is all-in on GitHub. Which of these give you <b>built-in</b> traceability from an issue to production? <i>Select all that apply.</i>`,
+     options:[
+       "The issue's Development section showing linked branches and pull requests",
+       "A PR description with Closes #42, merged into the default branch",
+       "Deployment environments that record which commit was deployed by which workflow run",
+       "Generated release notes that list the merged pull requests",
+       "Labels, which automatically link commits to issues",
+       "Repository stars"
+     ], answer:[0,1,2,3],
+     hint:`Labels and stars categorize or bookmark; they don't link anything.`,
+     why:`The Development section links issues to branches/PRs, closing keywords tie the merged PR to the issue, environments keep a deployment history per commit and workflow run, and generated release notes connect releases to PRs. Labels only categorize, and stars are bookmarks.`}
+  ]
+},
+/* ================================================================ 9 */
+{
+  group:"Review",
+  title:"Mixed review & scenarios",
+  tag:"exam-style scenarios across the whole theme",
+  intro:`Time to combine everything. These scenarios mix GitHub Flow, Azure Boards, GitHub Issues and Projects, notifications and traceability, the way the exam does. Read each one carefully: the deciding detail is often a single phrase.`,
+  sections:[
+    {h:"Quick decision table", lang:"text", code:`Need                                          Answer
+One deployable main, short-lived branches     GitHub Flow + branch protection / rulesets
+Formal change requests and risks              CMMI process
+Add a field / state / work item type          Inherited process
+Multi-team timeline with dependencies         Delivery Plans
+Visible but non-blocking work limits          WIP limits on board columns
+Structured bug reports, no blank issues       Issue forms + config.yml
+Sprint planning in GitHub Projects            Iteration field (+ Roadmap/Board views)
+GitHub code ↔ Azure Boards                    Azure Boards app + AB#ID (Fixes AB#ID)
+Close a GitHub issue from a PR                Closes/Fixes/Resolves #ID, PR into default branch
+Every Azure Repos PR linked to work           Check for linked work items: Required
+Notify a whole team                           Team notification subscription
+Free access for business feedback             Stakeholder access level`}
+  ],
+  tip:`Read for the constraint words: <b>"minimize administrative effort"</b> usually points to a built-in feature (built-in workflows, team subscriptions, branch policies) over custom scripts; <b>"must"</b> or <b>"ensure"</b> points to something enforced (policies, required fields), not a convention.`,
+  exercises:[
+    {id:"rv1", type:"mc", title:"GitHub code, Azure Boards planning",
+     q:`Contoso keeps code in GitHub and plans in Azure Boards. Developers want a merged PR to <b>automatically move the related user story to Done</b>, with the least administrative effort. What should you do?`,
+     options:[
+       "Install and configure the Azure Boards app for the repos, then put Fixes AB#&lt;ID&gt; in the PR description",
+       "Write Closes #&lt;ID&gt; in the PR description",
+       "Mirror the GitHub repos into Azure Repos and use commit mention resolution",
+       "Write a GitHub Actions workflow that calls the Azure DevOps REST API on every merge"
+     ], answer:0,
+     hint:`Use the built-in integration and its keyword syntax.`,
+     why:`The Azure Boards app connects GitHub repos to the project, and <code>Fixes AB#ID</code> both links and transitions the work item when the PR merges. <code>Closes #ID</code> targets GitHub issues. Mirroring repos or custom workflows add effort for something that's built in.`},
+    {id:"rv2", type:"multi", title:"Better incoming bug reports",
+     q:`An open-source project receives many issues without reproduction steps or version info, plus lots of questions that belong in Discussions. Which changes help? <i>Select all that apply.</i>`,
+     options:[
+       "Add an issue form with required textarea (repro steps) and input (version) fields",
+       "Set blank_issues_enabled: false in .github/ISSUE_TEMPLATE/config.yml",
+       "Add a contact link in config.yml pointing questions to Discussions",
+       "Set the repository's watch setting to Ignore",
+       "Add a required status check to main"
+     ], answer:[0,1,2],
+     hint:`Fix the intake: what people see when they click New issue.`,
+     why:`A form with required fields guarantees the data, disabling blank issues forces the form, and contact links redirect questions. Watch settings only affect your own notifications, and status checks protect merges, not issue quality.`},
+    {id:"rv3", type:"mc", title:"Sprints in GitHub Projects",
+     q:`A team planning in GitHub Projects wants two-week sprints, a board for the current sprint, and a timeline of upcoming sprints for stakeholders. What's the minimal setup?`,
+     options:[
+       "Add an Iteration field; create a Board view filtered to the current iteration and a Roadmap view by iteration",
+       "Create one milestone per sprint in every repository and a Table view",
+       "Add a Text field Sprint and type the sprint name on every item",
+       "Use labels sprint-1, sprint-2 … and a Board view grouped by label"
+     ], answer:0,
+     hint:`One field type is built for time-boxed cycles, and one layout draws timelines.`,
+     why:`The <b>Iteration</b> field handles cycles (duration, breaks, current/next filters like <code>iteration:@current</code>), the Board view can filter on it, and the Roadmap layout shows iterations on a timeline. Milestones are per repo, and text fields or labels have no dates.`},
+    {id:"rv4", type:"order", title:"A GitHub-only flow, end to end",
+     q:`Order these steps for a fully traceable change in a GitHub-only setup.`,
+     items:[
+       "A bug is reported through an issue form and auto-added to the project",
+       "A developer creates a branch from the issue's Development section",
+       "She pushes commits and opens a PR with Closes #87 in the description",
+       "Reviewers approve and the required Actions checks pass",
+       "The PR merges into main; the issue closes and the project item moves to Done",
+       "The workflow deploys main to the production environment"
+     ],
+     hint:`Intake → branch → PR → gate → merge → deploy.`,
+     why:`This combines everything: issue forms and Auto-add (intake), the Development section (branch linked to the issue), closing keywords (PR ↔ issue), branch protection with required checks (quality gate), built-in project workflows (status) and environments (deployment history).`},
+    {id:"rv5", type:"mc", title:"Process change request",
+     q:`A Scrum-based project needs a new state <b>In Review</b> between Committed and Done for PBIs, shown as its own column on the board. Several other projects use the same process and should get it too. What do you do?`,
+     options:[
+       "Add the In Review state to the PBI type in the shared inherited Scrum process; the board can then show it as a column",
+       "Only add a board column In Review in one team's board settings",
+       "Edit the system Scrum process",
+       "Create a custom field Review status and a swimlane"
+     ], answer:0,
+     hint:`The state must exist for every project, not just on one team's board.`,
+     why:`Adding a custom state to the PBI type in the <b>inherited process</b> applies to every project using that process, and boards can map a column to it. A board-only column would affect one team and not create a real state, and system processes can't be edited.`},
+    {id:"rv6", type:"mc", title:"Audit trail for a hotfix",
+     q:`After an incident, management asks: "Which requirement did the change that broke production belong to, and who approved it?" Code is in Azure Repos, pipelines deploy to environments. Which combination would let you answer this <b>for every future change</b>?`,
+     options:[
+       "Branch policies on main requiring reviewers and linked work items, with pipelines linking work items to runs and deploying through environments",
+       "A weekly email digest of all commits",
+       "Asking developers to mention the story in Teams when they merge",
+       "WIP limits on the board's Done column"
+     ], answer:0,
+     hint:`You need enforced links (requirement ↔ PR ↔ approver) plus deployment history.`,
+     why:`Required reviewers record who approved the PR, the linked-work-items policy ties the PR to a requirement, pipeline runs link the work items they contain, and environments record which run (and so which commits) reached production. Together they give an audit trail from incident back to requirement and approver.`}
+  ]
+}
+];
+
+/* ===================================================================
+   MINI YAML PARSER (same as the Pipelines lab)
+   Turns YAML into a flat list of { path, value } entries, e.g.
+     body[0].type = textarea
+   =================================================================== */
+const toStr = t => t.reduce((s, x) => x[0] === "[" ? s + x : (s ? s + "." + x : x), "");
+
+function cleanVal(v){
+  v = (v || "").trim();
+  if (v[0] === "'"){ const m = v.match(/^'((?:[^']|'')*)'/); if (m) return m[1].replace(/''/g, "'"); }
+  if (v[0] === '"'){ const m = v.match(/^"((?:[^"\\]|\\.)*)"/); if (m) return m[1]; }
+  const ci = v.search(/(^|\s)#/);
+  return (ci >= 0 ? v.slice(0, ci) : v).trim();
+}
+
+function splitFlow(inner){
+  const out = []; let cur = "", depth = 0, q = null;
+  for (const ch of inner){
+    if (q){ cur += ch; if (ch === q) q = null; continue; }
+    if (ch === "'" || ch === '"'){ q = ch; cur += ch; continue; }
+    if ("[{(".includes(ch)) depth++;
+    if ("]})".includes(ch)) depth--;
+    if (ch === "," && depth === 0){ out.push(cur); cur = ""; continue; }
+    cur += ch;
+  }
+  if (cur.trim()) out.push(cur);
+  return out.map(s => s.trim()).filter(Boolean);
+}
+
+function parseYaml(text){
+  const lines = text.replace(/\r/g, "").split("\n");
+  const entries = [], errors = [];
+  const root = {col:-1, gt:[], it:[], kids:null};
+  const stack = [root], counters = new Map();
+  const top = () => stack[stack.length - 1];
+  const add = (gt, it, value, line) => entries.push({gt, it, gen:toStr(gt), idx:toStr(it), value, line});
+  let flagged = -1;
+  const sibling = (parent, col, ln, kind) => {
+    if (parent.kind && parent.kind !== kind && flagged !== ln){
+      flagged = ln;
+      errors.push(`Line ${ln}: this ${kind === "list" ? "list item" : "key"} sits at the same level as ${kind === "list" ? "keys" : "\"- \" list items"} under the same parent. Check the indentation.`);
+    }
+    parent.kind = parent.kind || kind;
+    if (parent.kids === null) parent.kids = col;
+    else if (parent.kids !== col && flagged !== ln)
+      errors.push(`Line ${ln}: indented ${col} spaces, but its siblings use ${parent.kids}. Items at the same level must line up exactly.`);
+  };
+  let lastScalar = null;
+
+  for (let i = 0; i < lines.length; i++){
+    const raw = lines[i], ln = i + 1;
+    if (!raw.trim() || /^\s*#/.test(raw)) continue;
+    if (/^ *\t/.test(raw)){ errors.push(`Line ${ln}: a tab is used for indentation. YAML only allows spaces.`); continue; }
+    const lineCol = raw.match(/^ */)[0].length;
+    let col = lineCol, rest = raw.slice(col).replace(/\s+$/, "");
+    if (lastScalar && col > lastScalar.col && (flagged = ln))
+      errors.push(`Line ${ln}: indented under "${lastScalar.key}" (line ${lastScalar.ln}), but that key already has a value on its own line.`);
+    lastScalar = null;
+
+    let dashNode = null;
+    while (/^-(\s|$)/.test(rest)){
+      while (stack.length > 1 && (top().col > col || (top().dash && top().col === col))) stack.pop();
+      const parent = top();
+      sibling(parent, col, ln, "list");
+      const n = counters.get(parent) ?? 0; counters.set(parent, n + 1);
+      dashNode = {col, gt:[...parent.gt, "[]"], it:[...parent.it, `[${n}]`], kids:null, dash:true};
+      stack.push(dashNode);
+      const m = rest.match(/^-\s*/)[0].length;
+      col += m; rest = rest.slice(m);
+    }
+    if (!rest) continue;
+
+    const km = /^['"]/.test(rest) ? null : rest.match(/^(.+?)\s*:(?:\s+(.*))?$/);
+    if (!km){
+      if (dashNode) add(dashNode.gt, dashNode.it, cleanVal(rest), ln);
+      else errors.push(`Line ${ln}: "${rest.slice(0, 40)}" is not a "key: value" pair or a "- item". Check for a missing colon or a missing space after it.`);
+      continue;
+    }
+
+    const key = cleanVal(km[1]) || km[1];
+    while (stack.length > 1 && top().col >= col) stack.pop();
+    const parent = top();
+    sibling(parent, col, ln, "map");
+    const gt = [...parent.gt, key], it = [...parent.it, key];
+    const rawVal = (km[2] || "").trim();
+
+    if (/^[|>][-+]?\d*\s*(#.*)?$/.test(rawVal)){
+      const body = []; let j = i + 1;
+      for (; j < lines.length; j++){
+        const l = lines[j];
+        if (!l.trim()){ body.push(""); continue; }
+        if (l.match(/^ */)[0].length > lineCol) body.push(l); else break;
+      }
+      while (body.length && !body[body.length - 1].trim()) body.pop();
+      const ind = body.filter(x => x.trim()).map(x => x.match(/^ */)[0].length);
+      const min = ind.length ? Math.min(...ind) : 0;
+      if (!body.length) errors.push(`Line ${ln}: "${key}: ${rawVal}" starts a multi-line block, but no indented lines follow.`);
+      add(gt, it, body.map(x => x.slice(min)).join("\n"), ln);
+      i = j - 1;
+      continue;
+    }
+
+    const quoted = /^['"]/.test(rawVal);
+    const v = cleanVal(rawVal);
+    if (v === "" && !quoted){
+      stack.push({col, gt, it, kids:null});
+      add(gt, it, "", ln);
+    } else if (!quoted && /^\[.*\]$/.test(v)){
+      add(gt, it, "", ln);
+      splitFlow(v.slice(1, -1)).forEach((x, k) => add([...gt, "[]"], [...it, `[${k}]`], cleanVal(x), ln));
+      lastScalar = {col, key, ln};
+    } else if (!quoted && /^\{.*\}$/.test(v)){
+      add(gt, it, "", ln);
+      splitFlow(v.slice(1, -1)).forEach(pair => {
+        const pm = pair.match(/^(.+?)\s*:\s*(.*)$/);
+        if (pm) add([...gt, cleanVal(pm[1])], [...it, cleanVal(pm[1])], cleanVal(pm[2]), ln);
+      });
+      lastScalar = {col, key, ln};
+    } else {
+      add(gt, it, v, ln);
+      lastScalar = {col, key, ln};
+    }
+  }
+  return {entries, errors};
+}
+
+function globRe(p){
+  if (p instanceof RegExp) return p;
+  return new RegExp("^" + p.split(/(\*\*|\*|\[\]\?)/).map(s =>
+    s === "**" ? ".*" :
+    s === "*" ? "[^.\\[\\]]*" :
+    s === "[]?" ? "(\\[\\])?" :
+    s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("") + "$", "i");
+}
+const valMatch = (v, w) => w === undefined ? true : w instanceof RegExp ? w.test(v) : String(v).toLowerCase() === String(w).toLowerCase();
+
+function makeApi(entries, src){
+  const find = (p, w) => { const re = globRe(p); return entries.filter(e => re.test(e.gen) && valMatch(e.value, w)); };
+  return {
+    src,
+    h: (p, w) => find(p, w).length > 0,
+    count: (p, w) => find(p, w).length,
+    first: (p, w) => Math.min(Infinity, ...find(p, w).map(e => e.line)),
+    item(listPath, conds){
+      const re = globRe(listPath + "[]"), groups = new Map();
+      for (const e of entries){
+        for (let n = 1; n <= e.gt.length; n++){
+          if (e.gt[n - 1] !== "[]" || !re.test(toStr(e.gt.slice(0, n)))) continue;
+          const k = toStr(e.it.slice(0, n));
+          if (!groups.has(k)) groups.set(k, []);
+          groups.get(k).push({rel:toStr(e.gt.slice(n)), value:e.value});
+        }
+      }
+      return [...groups.values()].some(list =>
+        Object.entries(conds).every(([rp, w]) => { const r = globRe(rp); return list.some(x => r.test(x.rel) && valMatch(x.value, w)); }));
+    }
+  };
+}
+
+/* ===================================================================
+   CHECKING (pure functions, no DOM: also used by the self-test)
+   =================================================================== */
+const norm = s => String(s).trim().replace(/\s+/g, " ").toLowerCase();
+const sameSet = (a, b) => a.length === b.length && [...a].sort().join() === [...b].sort().join();
+
+// Returns {ok, results:[{l, ok, sub?}], marks}  (marks drive per-item coloring)
+function grade(ex, ans){
+  switch (ex.type){
+    case "mc": {
+      const ok = ans === ex.answer;
+      return {ok, results:[{l: ans === null || ans === undefined ? "Pick an answer first." : ok ? "Correct!" : "Not quite. Read the hint and try again.", ok}]};
+    }
+    case "multi": {
+      const sel = ans || [];
+      const missing = ex.answer.filter(i => !sel.includes(i)).length;
+      const extra = sel.filter(i => !ex.answer.includes(i)).length;
+      const ok = missing === 0 && extra === 0;
+      const r = [];
+      if (ok) r.push({l:"Correct! You found exactly the right options.", ok:true});
+      else {
+        r.push({l: missing ? `${missing} correct option${missing > 1 ? "s" : ""} not selected` : "All correct options selected", ok: !missing});
+        r.push({l: extra ? `${extra} selected option${extra > 1 ? "s are" : " is"} wrong` : "No wrong options selected", ok: !extra});
+      }
+      return {ok, results:r};
+    }
+    case "order": {
+      const seq = ans || [];
+      const marks = seq.map((it, pos) => it === pos);
+      const right = marks.filter(Boolean).length;
+      const ok = right === ex.items.length;
+      return {ok, marks, results:[{l: ok ? "Correct order!" : `${right}/${ex.items.length} items are in the right position.`, ok}]};
+    }
+    case "match": {
+      const sel = ans || [];
+      const marks = ex.rows.map((r, i) => sel[i] === r[1]);
+      const right = marks.filter(Boolean).length;
+      const ok = right === ex.rows.length;
+      return {ok, marks, results:[{l: ok ? "All matches correct!" : `${right}/${ex.rows.length} matches correct.`, ok}]};
+    }
+    case "fill": {
+      const vals = ans || [];
+      const marks = ex.blanks.map((acc, i) => acc.some(a => norm(a) === norm(vals[i] || "")));
+      const right = marks.filter(Boolean).length;
+      const ok = right === ex.blanks.length;
+      return {ok, marks, results:[{l: ok ? "All blanks correct!" : `${right}/${ex.blanks.length} blanks correct.`, ok}]};
+    }
+    case "lines": {
+      const sel = ans || [];
+      const missing = ex.answer.filter(i => !sel.includes(i)).length;
+      const extra = sel.filter(i => !ex.answer.includes(i)).length;
+      const ok = missing === 0 && extra === 0;
+      const r = ok ? [{l:"Correct! You spotted exactly the right lines.", ok:true}] : [
+        {l: missing ? `${missing} line${missing > 1 ? "s" : ""} still to find` : "You found every faulty line", ok: !missing},
+        {l: extra ? `${extra} selected line${extra > 1 ? "s are" : " is"} actually fine` : "No correct lines selected by mistake", ok: !extra}];
+      return {ok, results:r};
+    }
+    case "text": {
+      const text = String(ans || "").replace(/\r/g, "");
+      const results = [];
+      let api;
+      if (ex.lang === "yaml"){
+        const p = parseYaml(text);
+        results.push({l:"Valid YAML structure: spaces only, aligned siblings, key: value pairs", ok: p.errors.length === 0 && p.entries.length > 0, sub:p.errors});
+        api = makeApi(p.entries, text.replace(/^\s*#.*$/gm, ""));
+      } else {
+        const lines = text.split("\n").map(l => l.trim()).filter(l => l && !l.startsWith("#"));
+        api = {src:text, lines};
+      }
+      for (const c of ex.checks){
+        let ok = false;
+        try { ok = !!c.t(api); } catch (e) { ok = false; }
+        results.push({l:c.l, ok});
+      }
+      return {ok: results.every(r => r.ok), results};
+    }
+  }
+  return {ok:false, results:[]};
+}
+
+// The model answer for each exercise, in the same shape grade() expects.
+function modelAnswer(ex){
+  switch (ex.type){
+    case "mc": return ex.answer;
+    case "multi": case "lines": return ex.answer.slice();
+    case "order": return ex.items.map((_, i) => i);
+    case "match": return ex.rows.map(r => r[1]);
+    case "fill": return ex.blanks.map(b => b[0]);
+    case "text": return ex.solution;
+  }
+}
+
+// Deterministic shuffle so the starting order is stable between visits.
+function scramble(id, n){
+  let seed = 0; for (const ch of id) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
+  const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
+  const a = [...Array(n).keys()];
+  for (let i = n - 1; i > 0; i--){ const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  if (a.every((v, i) => v === i)) a.reverse();
+  return a;
+}
+
+const ALL_EX = MODULES.flatMap(m => m.exercises);
+
+/* ===================================================================
+   HIGHLIGHTER (tiny, dependency-free)
+   =================================================================== */
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+function commentAt(v){
+  let q = null;
+  for (let i = 0; i < v.length; i++){
+    const ch = v[i];
+    if (q){ if (ch === q) q = null; continue; }
+    if ((ch === "'" || ch === '"') && (i === 0 || /\s/.test(v[i - 1]))){ q = ch; continue; }
+    if (ch === "#" && (i === 0 || /\s/.test(v[i - 1]))) return i;
+  }
+  return -1;
+}
+function hlValue(v){
+  const ci = commentAt(v);
+  const body = ci >= 0 ? v.slice(0, ci) : v, comment = ci >= 0 ? v.slice(ci) : "";
+  const t = body.trim();
+  let out;
+  if (/^(['"]).*\1$/.test(t)) out = `<span class="ts">${esc(body)}</span>`;
+  else if (/^[|>][-+]?\d*$/.test(t)) out = `<span class="tk">${esc(body)}</span>`;
+  else if (/^(true|false|none|null|~|-?\d+(\.\d+)?)$/i.test(t)) out = `<span class="tn">${esc(body)}</span>`;
+  else out = esc(body);
+  return out + (comment ? `<span class="tc">${esc(comment)}</span>` : "");
+}
+function hlYaml(code){
+  let blockCol = -1;
+  return code.split("\n").map(line => {
+    const ind = line.match(/^ */)[0].length;
+    if (blockCol >= 0){
+      if (!line.trim() || ind > blockCol) return esc(line);
+      blockCol = -1;
+    }
+    const [, sp, dash, rest] = line.match(/^(\s*)((?:-\s+|-$)*)(.*)$/);
+    if (rest.startsWith("#")) return esc(sp + dash) + `<span class="tc">${esc(rest)}</span>`;
+    let out = esc(sp) + (dash ? `<span class="tdash">${esc(dash)}</span>` : "");
+    const km = /^['"]/.test(rest) ? null : rest.match(/^(.+?)(\s*:)(\s+.*)?$/);
+    if (km){
+      out += `<span class="tk">${esc(km[1])}</span>${esc(km[2])}`;
+      if (km[3]){
+        const lead = km[3].match(/^\s*/)[0], val = km[3].slice(lead.length);
+        out += lead + hlValue(val);
+        if (/^[|>][-+]?\d*\s*(#.*)?$/.test(val.trim())) blockCol = ind;
+      }
+    } else out += hlValue(rest);
+    return out;
+  }).join("\n");
+}
+function hlSh(code){
+  return code.split("\n").map(line => {
+    const m = line.match(/^(\s*)(#.*)$/);
+    if (m) return esc(m[1]) + `<span class="tc">${esc(m[2])}</span>`;
+    const ci = line.search(/\s#\s/);
+    const body = ci >= 0 ? line.slice(0, ci) : line, c = ci >= 0 ? line.slice(ci) : "";
+    return esc(body).replace(/^(\s*)(git|gh)\b/, '$1<span class="tk">$2</span>').replace(/(\s)(--?[\w-]+)/g, '$1<span class="tt">$2</span>')
+      + (c ? `<span class="tc">${esc(c)}</span>` : "");
+  }).join("\n");
+}
+function hlText(code){
+  // highlight AB#123, #123, @mentions and trailing comments in plain text blocks
+  return code.split("\n").map(line => {
+    const ci = line.search(/\s{2,}(?=\S)/);
+    const body = ci >= 0 ? line.slice(0, ci) : line, rest = ci >= 0 ? line.slice(ci) : "";
+    const h = s => esc(s).replace(/(AB#\d+|(?:^|(?<=\s))[!#]\d+|@[\w-]+(?:\/[\w-]+)?)/g, '<span class="td">$1</span>');
+    return h(body) + (rest ? `<span class="tc">${esc(rest)}</span>` : "");
+  }).join("\n");
+}
+function highlight(code, lang){
+  if (lang === "text") return hlText(code);
+  if (lang === "sh") return hlSh(code);
+  return hlYaml(code);
+}
+function codeBlock(code, lang){
+  return `<div class="codewrap"><pre><code>${highlight(code, lang || "yaml")}</code></pre><button class="copy">Copy</button></div>`;
+}
+
+/* ===================================================================
+   UI
+   =================================================================== */
+const KIND = {mc:"Single choice", multi:"Select all that apply", order:"Put in order", match:"Match", fill:"Fill in the blanks", lines:"Spot the error", text:"Write it"};
+
+function startApp(){
+  const store = {
+    get(k, d){ try { const v = localStorage.getItem("flowLab:" + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v){ try { localStorage.setItem("flowLab:" + k, JSON.stringify(v)); } catch {} }
+  };
+  let done = store.get("done", []).filter(id => ALL_EX.some(e => e.id === id));
+  let current = Math.min(store.get("current", 0), MODULES.length - 1);
+  const $ = s => document.querySelector(s);
+  const state = {};   // exercise id → current answer
+  const modDone = m => m.exercises.filter(e => done.includes(e.id)).length;
+
+  function renderNav(){
+    let html = "", lastGroup = "";
+    MODULES.forEach((m, i) => {
+      if (m.group !== lastGroup){ html += `<div class="group">${m.group}</div>`; lastGroup = m.group; }
+      const n = modDone(m), all = n === m.exercises.length;
+      const cls = [i === current ? "active" : "", all ? "done" : ""].join(" ");
+      html += `<button class="${cls}" data-i="${i}"><span class="num">${all ? "✓" : i + 1}</span>${m.title}<span class="cnt">${n}/${m.exercises.length}</span></button>`;
+    });
+    $("#nav").innerHTML = html;
+    $("#bar").style.width = (done.length / ALL_EX.length * 100) + "%";
+    $("#ptext").textContent = `${done.length} of ${ALL_EX.length} exercises completed`;
+  }
+
+  /* ---------- per-type input rendering ---------- */
+  function bodyHtml(ex){
+    const sid = ex.id;
+    switch (ex.type){
+      case "mc": case "multi":
+        return `<div class="opts">${ex.options.map((o, i) =>
+          `<label class="opt" data-i="${i}"><input type="${ex.type === "mc" ? "radio" : "checkbox"}" name="${sid}" value="${i}"><span>${o}</span></label>`).join("")}</div>`;
+      case "order":
+        return `<ol class="order" id="ol-${sid}"></ol>`;
+      case "match":
+        return `<table class="match">${ex.rows.map((r, i) =>
+          `<tr data-i="${i}"><td>${r[0]}</td><td><select aria-label="Answer ${i + 1}"><option value="">— choose —</option>${ex.choices.map(c => `<option>${esc(c)}</option>`).join("")}</select></td></tr>`).join("")}</table>`;
+      case "fill": {
+        let k = 0;
+        const html = ex.tpl.replace(/\[\[(\d+)\]\]/g, (_, n) => {
+          const w = Math.max(6, ...ex.blanks[+n].map(b => b.length)) + 2;
+          k++; return `<input data-b="${n}" size="${w}" aria-label="Blank ${+n + 1}" autocomplete="off" spellcheck="false">`;
+        });
+        return `<div class="fill${ex.mono ? " mono" : ""}">${html}</div>`;
+      }
+      case "lines":
+        return `<div class="lines${ex.prose ? " prose" : ""}">${ex.code.map((l, i) =>
+          `<div class="ln" data-i="${i}" role="button" tabindex="0"><span class="no">${i + 1}</span><span>${esc(l) || " "}</span></div>`).join("")}</div>`;
+      case "text":
+        return `<textarea class="${ex.lang === "yaml" ? "" : "short"}" spellcheck="false" aria-label="Answer editor"></textarea>
+          <p class="edhelp">${ex.lang === "yaml" ? "Tab / Shift+Tab indent by 2 spaces · Enter keeps the indentation · " : ""}Ctrl+Enter checks your answer · your draft is saved automatically</p>`;
+    }
+  }
+
+  function solutionHtml(ex){
+    switch (ex.type){
+      case "mc": return `<p><b>Answer:</b> ${ex.options[ex.answer]}</p>`;
+      case "multi": return `<ul class="tips">${ex.answer.map(i => `<li>${ex.options[i]}</li>`).join("")}</ul>`;
+      case "order": return `<ol class="tips">${ex.items.map(t => `<li>${t}</li>`).join("")}</ol>`;
+      case "match": return `<div class="tablewrap"><table class="ref">${ex.rows.map(r => `<tr><td>${r[0]}</td><td><b>${esc(r[1])}</b></td></tr>`).join("")}</table></div>`;
+      case "fill": {
+        const html = ex.tpl.replace(/\[\[(\d+)\]\]/g, (_, n) => `<b><u>${esc(ex.blanks[+n][0])}</u></b>`);
+        return `<div class="fill${ex.mono ? " mono" : ""}">${html}</div>`;
+      }
+      case "lines": return `<p>Faulty line${ex.answer.length > 1 ? "s" : ""}: ${ex.answer.map(i => `<b>${i + 1}</b>`).join(", ")}</p>`;
+      case "text": return codeBlock(ex.solution, ex.lang === "yaml" ? "yaml" : "text");
+    }
+  }
+
+  function wireExercise(ex, root){
+    const id = ex.id;
+    const q = s => root.querySelector(s);
+    const draftKey = "draft:" + id;
+
+    if (ex.type === "mc"){
+      root.querySelectorAll("input").forEach(inp => inp.onchange = () => { state[id] = +inp.value; clearMarks(); });
+      state[id] = null;
+    }
+    if (ex.type === "multi"){
+      state[id] = [];
+      root.querySelectorAll("input").forEach(inp => inp.onchange = () => {
+        state[id] = [...root.querySelectorAll("input:checked")].map(x => +x.value); clearMarks();
+      });
+    }
+    if (ex.type === "order"){
+      state[id] = scramble(id, ex.items.length);
+      const ol = q(".order");
+      let dragFrom = null;
+      const draw = (marks) => {
+        ol.innerHTML = state[id].map((it, pos) =>
+          `<li draggable="true" data-pos="${pos}" class="${marks ? (marks[pos] ? "right" : "wrong") : ""}"><span class="pos">${pos + 1}</span><span class="txt">${ex.items[it]}</span>
+            <span class="mv"><button class="btn small" data-mv="-1" ${pos === 0 ? "disabled" : ""} aria-label="Move up">↑</button><button class="btn small" data-mv="1" ${pos === ex.items.length - 1 ? "disabled" : ""} aria-label="Move down">↓</button></span></li>`).join("");
+      };
+      const move = (from, to) => {
+        const a = state[id]; const [x] = a.splice(from, 1); a.splice(to, 0, x); draw();
+      };
+      ol.onclick = e => {
+        const b = e.target.closest("button[data-mv]"); if (!b) return;
+        const pos = +b.closest("li").dataset.pos, to = pos + +b.dataset.mv;
+        if (to >= 0 && to < ex.items.length) move(pos, to);
+      };
+      ol.addEventListener("dragstart", e => { const li = e.target.closest("li"); if (li){ dragFrom = +li.dataset.pos; e.dataTransfer.effectAllowed = "move"; try { e.dataTransfer.setData("text/plain", ""); } catch {} } });
+      ol.addEventListener("dragover", e => { if (dragFrom !== null) e.preventDefault(); });
+      ol.addEventListener("drop", e => { e.preventDefault(); const li = e.target.closest("li"); if (li && dragFrom !== null) move(dragFrom, +li.dataset.pos); dragFrom = null; });
+      ol.addEventListener("dragend", () => { dragFrom = null; });
+      root._draw = draw;
+      draw();
+    }
+    if (ex.type === "match"){
+      state[id] = ex.rows.map(() => "");
+      root.querySelectorAll("select").forEach((s, i) => s.onchange = () => { state[id][i] = s.value; s.closest("tr").className = ""; });
+    }
+    if (ex.type === "fill"){
+      state[id] = ex.blanks.map(() => "");
+      root.querySelectorAll(".fill input").forEach(inp => {
+        inp.oninput = () => { state[id][+inp.dataset.b] = inp.value; inp.className = ""; };
+        inp.onkeydown = e => { if (e.key === "Enter"){ e.preventDefault(); check(); } };
+      });
+    }
+    if (ex.type === "lines"){
+      state[id] = [];
+      const toggle = el => {
+        const i = +el.dataset.i, a = state[id];
+        if (a.includes(i)) a.splice(a.indexOf(i), 1); else a.push(i);
+        root.querySelectorAll(".ln").forEach(l => l.className = "ln" + (a.includes(+l.dataset.i) ? " sel" : ""));
+      };
+      root.querySelectorAll(".ln").forEach(el => {
+        el.onclick = () => toggle(el);
+        el.onkeydown = e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); toggle(el); } };
+      });
+    }
+    if (ex.type === "text"){
+      const ed = q("textarea");
+      const saved = store.get(draftKey, null);
+      ed.value = saved !== null ? saved : ex.starter;
+      state[id] = ed.value;
+      const save = () => { state[id] = ed.value; store.set(draftKey, ed.value); };
+      const insert = t => {
+        ed.focus();
+        if (!document.execCommand || !document.execCommand("insertText", false, t)){
+          const s = ed.selectionStart, en = ed.selectionEnd;
+          ed.value = ed.value.slice(0, s) + t + ed.value.slice(en);
+          ed.selectionStart = ed.selectionEnd = s + t.length;
+          save();
+        }
+      };
+      ed.addEventListener("input", save);
+      ed.addEventListener("keydown", e => {
+        if (e.key === "Enter" && (e.ctrlKey || e.metaKey)){ e.preventDefault(); check(); return; }
+        if (ex.lang !== "yaml") return;
+        if (e.key === "Tab" && !e.shiftKey){ e.preventDefault(); insert("  "); return; }
+        if (e.key === "Tab" && e.shiftKey){
+          e.preventDefault();
+          const s = ed.selectionStart, ls = ed.value.lastIndexOf("\n", s - 1) + 1;
+          const n = ed.value.slice(ls, ls + 2).match(/^ {0,2}/)[0].length;
+          if (n){ ed.value = ed.value.slice(0, ls) + ed.value.slice(ls + n); ed.selectionStart = ed.selectionEnd = Math.max(ls, s - n); save(); }
+          return;
+        }
+        if (e.key === "Enter" && !e.shiftKey && !e.altKey){
+          const before = ed.value.slice(0, ed.selectionStart);
+          const line = before.slice(before.lastIndexOf("\n") + 1);
+          let ind = line.match(/^ */)[0].length;
+          const dm = line.slice(ind).match(/^(-\s+)+/);
+          if (dm && /:/.test(line)) ind += dm[0].length;
+          if (!/^\s*#/.test(line) && /(:|:\s*[|>][-+]?)\s*$/.test(line)) ind += 2;
+          e.preventDefault();
+          insert("\n" + " ".repeat(ind));
+        }
+      });
+    }
+
+    function clearMarks(){
+      root.querySelectorAll(".opt").forEach(o => o.classList.remove("right", "wrong"));
+    }
+
+    function check(){
+      const g = grade(ex, state[id]);
+      // per-item coloring
+      if (ex.type === "mc" || ex.type === "multi"){
+        clearMarks();
+        const sel = ex.type === "mc" ? (state[id] === null ? [] : [state[id]]) : state[id];
+        sel.forEach(i => root.querySelector(`.opt[data-i="${i}"]`).classList.add(
+          (ex.type === "mc" ? i === ex.answer : ex.answer.includes(i)) ? "right" : "wrong"));
+      }
+      if (ex.type === "order") root._draw(g.marks);
+      if (ex.type === "match") root.querySelectorAll(".match tr").forEach((tr, i) => tr.className = g.marks[i] ? "right" : "wrong");
+      if (ex.type === "fill") root.querySelectorAll(".fill input").forEach(inp => inp.className = g.marks[+inp.dataset.b] ? "right" : "wrong");
+      if (ex.type === "lines") root.querySelectorAll(".ln").forEach(l => {
+        const i = +l.dataset.i, sel = state[id].includes(i);
+        l.className = "ln" + (sel ? (ex.answer.includes(i) ? " right" : " wrong") : "");
+      });
+      q(".results").innerHTML = g.results.map(r =>
+        `<li class="${r.ok ? "pass" : "fail"}">${r.ok ? "✔" : "✘"} ${esc(r.l)}${(r.sub || []).map(s => `<span class="sub">↳ ${esc(s)}</span>`).join("")}</li>`).join("") +
+        (ex.type === "text" ? `<li class="${g.ok ? "pass" : "fail"}"><b>${g.results.filter(r => r.ok).length}/${g.results.length} checks passed${g.ok ? ". Nice work! 🎉" : ""}</b></li>` : "");
+      if (g.ok){
+        q(".why").style.display = "block";
+        if (!done.includes(id)){ done.push(id); store.set("done", done); renderNav(); }
+        root.classList.add("solved");
+      }
+    }
+
+    q(".checkBtn").onclick = check;
+    q(".hintBtn").onclick = () => { const h = q(".hint"); h.style.display = h.style.display === "block" ? "none" : "block"; };
+    q(".solBtn").onclick = e => {
+      const s = q(".solution"), show = s.style.display !== "block";
+      s.style.display = show ? "block" : "none";
+      q(".why").style.display = show || root.classList.contains("solved") ? "block" : "none";
+      e.target.textContent = show ? "Hide solution" : "Show solution";
+    };
+    q(".resetBtn").onclick = () => {
+      if (ex.type === "text") store.set(draftKey, null);
+      const fresh = document.createElement("section");
+      root.replaceWith(fresh);
+      buildExercise(ex, fresh);
+    };
+  }
+
+  function buildExercise(ex, el){
+    const n = ALL_EX.indexOf(ex) + 1;
+    el.className = "exercise" + (done.includes(ex.id) ? " solved" : "");
+    el.id = "ex-" + ex.id;
+    el.innerHTML = `
+      <h3>🧪 ${n}. ${ex.title} <span class="kind">${KIND[ex.type]}</span> <span class="badge">Completed</span></h3>
+      <div>${ex.q}</div>
+      ${bodyHtml(ex)}
+      <div class="btns">
+        <button class="btn primary checkBtn">Check my answer</button>
+        <button class="btn hintBtn">Hint</button>
+        <button class="btn solBtn">Show solution</button>
+        <button class="btn resetBtn">Reset</button>
+      </div>
+      <div class="hint">💡 ${ex.hint}</div>
+      <ul class="results"></ul>
+      <div class="solution"><p class="solhead">Model answer</p>${solutionHtml(ex)}</div>
+      <div class="why"><b>Why:</b> ${ex.why}</div>`;
+    wireExercise(ex, el);
+  }
+
+  function renderModule(){
+    const m = MODULES[current];
+    const sections = m.sections.map(s => `
+        <h3>${s.h}</h3>
+        ${s.p ? `<p>${s.p}</p>` : ""}
+        ${s.file ? `<div class="file">${s.file}</div>` : ""}
+        ${s.code ? codeBlock(s.code, s.lang) : ""}
+        ${s.after || ""}`).join("");
+
+    $("#content").innerHTML = `
+      <span class="tag">Module ${current + 1} of ${MODULES.length} · ${m.tag}</span>
+      <h2>${m.title}</h2>
+      <p class="lead">${m.intro}</p>
+      ${sections}
+      ${m.tip ? `<div class="note exam">🎯 <b>AZ-400 exam tip:</b> ${m.tip}</div>` : ""}
+      <h3 style="margin-top:36px">Exercises (${m.exercises.length})</h3>
+      <div id="exlist"></div>
+      <div class="navfoot">
+        <button class="btn" id="prevBtn" ${current === 0 ? "disabled" : ""}>← Previous</button>
+        <button class="btn" id="nextBtn" ${current === MODULES.length - 1 ? "disabled" : ""}>Next →</button>
+      </div>`;
+    const list = $("#exlist");
+    m.exercises.forEach(ex => { const el = document.createElement("section"); list.appendChild(el); buildExercise(ex, el); });
+    $("#prevBtn").onclick = () => go(current - 1);
+    $("#nextBtn").onclick = () => go(current + 1);
+    renderNav();
+    window.scrollTo(0, 0);
+  }
+
+  function go(i){
+    if (i < 0 || i >= MODULES.length) return;
+    current = i; store.set("current", i);
+    $("#side").classList.remove("open");
+    renderModule();
+  }
+
+  $("#nav").addEventListener("click", e => { const b = e.target.closest("button"); if (b) go(+b.dataset.i); });
+  $("#menuBtn").onclick = () => $("#side").classList.toggle("open");
+  document.addEventListener("click", e => {
+    if (!e.target.classList.contains("copy")) return;
+    const text = e.target.previousElementSibling.innerText;
+    navigator.clipboard?.writeText(text).then(() => { e.target.textContent = "Copied!"; setTimeout(() => e.target.textContent = "Copy", 1200); });
+  });
+  $("#themeBtn").onclick = () => {
+    const root = document.documentElement;
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark"; store.set("theme", root.dataset.theme);
+  };
+  $("#resetAllBtn").onclick = () => {
+    if (!confirm("Reset all progress and saved drafts for this lab?")) return;
+    done = []; store.set("done", done);
+    ALL_EX.filter(e => e.type === "text").forEach(e => store.set("draft:" + e.id, null));
+    renderModule();
+  };
+  const t = store.get("theme", null); if (t) document.documentElement.dataset.theme = t;
+
+  renderModule();
+}
+
+if (typeof document !== "undefined" && document.getElementById("content")) startApp();
+</script>
+</body>
+</html>
